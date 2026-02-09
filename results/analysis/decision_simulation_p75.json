@@ -1,0 +1,364 @@
+{
+  "timestamp": "2026-02-08T22:25:18.200708",
+  "phase": "Phase 6 - Task 3: Decision-Layer Simulation",
+  "decision_framework": {
+    "thresholds": {
+      "risk_quantile": 0.8,
+      "prob_low": 0.4,
+      "prob_high": 0.8,
+      "uncertainty_threshold": 0.5
+    },
+    "costs": {
+      "intervention": 1.0,
+      "missed_outbreak_loss": 10.0,
+      "false_alarm": 0.5,
+      "early_warning_benefit": 5.0
+    }
+  },
+  "aggregated": {
+    "total_interventions": 18,
+    "true_positives": 1,
+    "false_positives": 10,
+    "total_outbreaks": 14,
+    "detected": 1,
+    "missed": 13,
+    "sensitivity": 0.07142857142857142,
+    "precision": 0.05555555555555555,
+    "false_alarm_rate": 0.5555555555555556,
+    "median_lead_time": 11.0,
+    "mean_lead_time": 11.0,
+    "std_lead_time": 0.0,
+    "total_cost": 148.0,
+    "net_benefit": -148.0
+  },
+  "fold_results": [
+    {
+      "fold": "fold_2017",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 3,
+          "true_positive": 0,
+          "false_positive": 3
+        },
+        "outbreaks": {
+          "total": 2,
+          "detected": 0,
+          "missed": 2
+        },
+        "lead_times": [],
+        "zone_transitions": 8,
+        "zone_distribution": {
+          "no_action": {
+            "count": 48,
+            "percentage": 70.58823529411765
+          },
+          "monitor": {
+            "count": 16,
+            "percentage": 23.52941176470588
+          },
+          "intervene": {
+            "count": 4,
+            "percentage": 5.88235294117647
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 24.5,
+          "intervention_cost": 3.0,
+          "false_alarm_cost": 1.5,
+          "missed_outbreak_loss": 20.0,
+          "early_warning_benefit": 0.0,
+          "net_benefit": -24.5
+        },
+        "metrics": {
+          "precision": 0.0,
+          "false_alarm_rate": 1.0,
+          "sensitivity": 0.0,
+          "miss_rate": 1.0,
+          "median_lead_time": null,
+          "mean_lead_time": null,
+          "lead_time_std": null,
+          "avg_transitions_per_episode": 0.20512820512820512
+        }
+      }
+    },
+    {
+      "fold": "fold_2018",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 4,
+          "true_positive": 0,
+          "false_positive": 2
+        },
+        "outbreaks": {
+          "total": 3,
+          "detected": 0,
+          "missed": 3
+        },
+        "lead_times": [],
+        "zone_transitions": 11,
+        "zone_distribution": {
+          "no_action": {
+            "count": 60,
+            "percentage": 75.0
+          },
+          "monitor": {
+            "count": 13,
+            "percentage": 16.25
+          },
+          "intervene": {
+            "count": 7,
+            "percentage": 8.75
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 35.0,
+          "intervention_cost": 4.0,
+          "false_alarm_cost": 1.0,
+          "missed_outbreak_loss": 30.0,
+          "early_warning_benefit": 0.0,
+          "net_benefit": -35.0
+        },
+        "metrics": {
+          "precision": 0.0,
+          "false_alarm_rate": 0.5,
+          "sensitivity": 0.0,
+          "miss_rate": 1.0,
+          "median_lead_time": null,
+          "mean_lead_time": null,
+          "lead_time_std": null,
+          "avg_transitions_per_episode": 0.2894736842105263
+        }
+      }
+    },
+    {
+      "fold": "fold_2019",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 5,
+          "true_positive": 1,
+          "false_positive": 2
+        },
+        "outbreaks": {
+          "total": 4,
+          "detected": 1,
+          "missed": 3
+        },
+        "lead_times": [
+          11
+        ],
+        "zone_transitions": 10,
+        "zone_distribution": {
+          "no_action": {
+            "count": 51,
+            "percentage": 67.10526315789474
+          },
+          "monitor": {
+            "count": 15,
+            "percentage": 19.736842105263158
+          },
+          "intervene": {
+            "count": 10,
+            "percentage": 13.157894736842104
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 31.0,
+          "intervention_cost": 5.0,
+          "false_alarm_cost": 1.0,
+          "missed_outbreak_loss": 30.0,
+          "early_warning_benefit": 5.0,
+          "net_benefit": -31.0
+        },
+        "metrics": {
+          "precision": 0.2,
+          "false_alarm_rate": 0.4,
+          "sensitivity": 0.25,
+          "miss_rate": 0.75,
+          "median_lead_time": 11.0,
+          "mean_lead_time": 11.0,
+          "lead_time_std": 0.0,
+          "avg_transitions_per_episode": 0.23809523809523808
+        }
+      }
+    },
+    {
+      "fold": "fold_2020",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 1,
+          "true_positive": 0,
+          "false_positive": 0
+        },
+        "outbreaks": {
+          "total": 2,
+          "detected": 0,
+          "missed": 2
+        },
+        "lead_times": [],
+        "zone_transitions": 2,
+        "zone_distribution": {
+          "no_action": {
+            "count": 17,
+            "percentage": 77.27272727272727
+          },
+          "monitor": {
+            "count": 3,
+            "percentage": 13.636363636363635
+          },
+          "intervene": {
+            "count": 2,
+            "percentage": 9.090909090909092
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 21.0,
+          "intervention_cost": 1.0,
+          "false_alarm_cost": 0.0,
+          "missed_outbreak_loss": 20.0,
+          "early_warning_benefit": 0.0,
+          "net_benefit": -21.0
+        },
+        "metrics": {
+          "precision": 0.0,
+          "false_alarm_rate": 0.0,
+          "sensitivity": 0.0,
+          "miss_rate": 1.0,
+          "median_lead_time": null,
+          "mean_lead_time": null,
+          "lead_time_std": null,
+          "avg_transitions_per_episode": 0.15384615384615385
+        }
+      }
+    },
+    {
+      "fold": "fold_2021",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 5,
+          "true_positive": 0,
+          "false_positive": 3
+        },
+        "outbreaks": {
+          "total": 3,
+          "detected": 0,
+          "missed": 3
+        },
+        "lead_times": [],
+        "zone_transitions": 5,
+        "zone_distribution": {
+          "no_action": {
+            "count": 23,
+            "percentage": 69.6969696969697
+          },
+          "monitor": {
+            "count": 5,
+            "percentage": 15.151515151515152
+          },
+          "intervene": {
+            "count": 5,
+            "percentage": 15.151515151515152
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 36.5,
+          "intervention_cost": 5.0,
+          "false_alarm_cost": 1.5,
+          "missed_outbreak_loss": 30.0,
+          "early_warning_benefit": 0.0,
+          "net_benefit": -36.5
+        },
+        "metrics": {
+          "precision": 0.0,
+          "false_alarm_rate": 0.6,
+          "sensitivity": 0.0,
+          "miss_rate": 1.0,
+          "median_lead_time": null,
+          "mean_lead_time": null,
+          "lead_time_std": null,
+          "avg_transitions_per_episode": 0.2631578947368421
+        }
+      }
+    },
+    {
+      "fold": "fold_2022",
+      "thresholds": {
+        "risk_quantile": 0.8,
+        "prob_low": 0.4,
+        "prob_high": 0.8,
+        "uncertainty_threshold": 0.5
+      },
+      "results": {
+        "interventions": {
+          "total": 0,
+          "true_positive": 0,
+          "false_positive": 0
+        },
+        "outbreaks": {
+          "total": 0,
+          "detected": 0,
+          "missed": 0
+        },
+        "lead_times": [],
+        "zone_transitions": 0,
+        "zone_distribution": {
+          "no_action": {
+            "count": 4,
+            "percentage": 66.66666666666666
+          },
+          "monitor": {
+            "count": 2,
+            "percentage": 33.33333333333333
+          }
+        },
+        "cost_analysis": {
+          "total_cost": 0.0,
+          "intervention_cost": 0.0,
+          "false_alarm_cost": 0.0,
+          "missed_outbreak_loss": 0.0,
+          "early_warning_benefit": 0.0,
+          "net_benefit": -0.0
+        },
+        "metrics": {
+          "precision": 0.0,
+          "false_alarm_rate": 0.0,
+          "sensitivity": 0.0,
+          "miss_rate": 0.0,
+          "median_lead_time": null,
+          "mean_lead_time": null,
+          "lead_time_std": null,
+          "avg_transitions_per_episode": 0.0
+        }
+      }
+    }
+  ]
+}

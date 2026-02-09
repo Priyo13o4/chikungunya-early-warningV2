@@ -1,0 +1,11 @@
+FIGURE: Lead-Time Distribution: Bayesian vs XGBoost
+============================================================
+
+WHAT IS SHOWN:
+Panel A: Histogram of lead times (weeks before outbreak) for episodes where models triggered. Panel B: Box plot showing median, IQR, and outliers. Only includes episodes where models warned.
+
+WHY IT MATTERS:
+Positive lead time = model warned before outbreak. Higher lead time = more advance warning. Bayesian model is designed to capture gradual risk escalation, potentially warning earlier than binary classifiers.
+
+CAVEATS:
+Episodes where model never warned (lead_time = -1) are excluded from these plots. See summary table for never-warned rates.

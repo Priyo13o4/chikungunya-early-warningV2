@@ -1,0 +1,5 @@
+state,district,year,fold,first_outbreak_week,peak_week,peak_cases,total_outbreak_weeks,outbreak_threshold,bayesian_trigger_week,xgboost_trigger_week,lead_time_bayesian,lead_time_xgboost,differential_lead,bayesian_threshold,xgboost_threshold
+Karnataka,Tumkur,2017,fold_2017,22,25,73.0,3,36.80000000000001,7.0,5.0,15,17,2.0,37.684937500000004,0.873126745223999
+Karnataka,Tumkur,2019,fold_2019,5,5,137.0,2,39.6,5.0,,0,-1,,37.316,0.9396677017211914
+Karnataka,Tumkur,2021,fold_2021,37,37,63.0,1,39.6,37.0,37.0,0,0,0.0,18.6965,0.9471035599708557
+Maharashtra,Satara,2021,fold_2021,5,5,20.0,4,7.0,,,-1,-1,,18.6965,0.9471035599708557

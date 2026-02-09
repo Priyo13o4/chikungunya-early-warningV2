@@ -1,0 +1,11 @@
+FIGURE: AUC Comparison: Track A Baselines vs Bayesian
+============================================================
+
+WHAT IS SHOWN:
+Bar chart comparing Area Under the ROC Curve (AUC-ROC) for XGBoost, Random Forest, Logistic Regression, and Bayesian hierarchical state-space model across rolling-origin CV folds.
+
+WHY IT MATTERS:
+Higher AUC indicates better discrimination between outbreak and non-outbreak weeks. XGBoost achieves ~0.76, while Bayesian achieves ~0.52. This is expected: Bayesian is designed for RISK INFERENCE, not binary classification. The comparison motivates using lead-time as the primary evaluation metric.
+
+CAVEATS:
+Bayesian model output is continuous risk (Z_t), not probability. AUC computed using posterior predictive threshold.

@@ -1,0 +1,147 @@
+# Chikungunya Early Warning System - Default Configuration
+# Version: 0.1
+# Last Updated: 2026-01-26
+
+# =============================================================================
+# DATA PATHS
+# =============================================================================
+data:
+  raw:
+    epiclim: "data/raw/Epiclim_Final_data.csv"
+    census: "data/raw/india_census_2011_district.csv"
+  processed:
+    panel: "data/processed/panel_chikungunya_v01.parquet"
+    features: "data/processed/features_engineered_v01.parquet"
+    samples: "data/processed/samples_supervised_v01.parquet"
+    cv_splits: "data/processed/cv_splits.json"
+
+# =============================================================================
+# DATA PROCESSING
+# =============================================================================
+processing:
+  disease_filter: "Chikungunya"  # Strict filter (not variants)
+  temperature_unit: "kelvin"     # Input is Kelvin; convert to Celsius
+  min_district_completeness: 0.80  # 80% non-missing weeks required
+  score_threshold: 80             # Fuzzy match score threshold for census linking
+  
+  # Imputation strategies
+  # CRITICAL: zero_fill for cases avoids forward-fill bias that suppresses outbreak onsets
+  # If missing = no report, zero_fill is appropriate for surveillance data
+  imputation:
+    cases: "zero_fill"            # Changed from forward_fill (see thesis methods)
+    temperature: "interpolate"
+    precipitation: "forward_fill"
+    lai: "forward_fill"
+
+# =============================================================================
+# FEATURE ENGINEERING
+# =============================================================================
+feature_engineering:
+  lookback_window: 12           # L: weeks of history for features
+  prediction_horizon: 3         # H: weeks ahead to predict
+  
+  case_lags: [1, 2, 4, 8]       # Which lags to include
+  climate_lags: [1, 2, 4, 8]    # Climate variable lags
+  rolling_windows: [4, 8]        # For variance, MA, etc.
+  
+  # Mechanistic features
+  # TODO: Perform sensitivity analysis (18°C, 20°C, 22°C) for thesis robustness
+  degree_day_threshold: 20.0    # Celsius - Aedes development threshold
+  
+  # Early warning features
+  variance_lookback: 52         # Weeks for baseline variance
+
+# =============================================================================
+# LABELS
+# =============================================================================
+labels:
+  # CRITICAL: This percentile MUST match evaluation in src/evaluation/lead_time.py
+  # Currently aligned at p75 for both training labels and outbreak detection
+  outbreak_percentile: 75       # p75 threshold for "elevated transmission risk"
+  horizon: 3                    # Predict outbreak in next H weeks
+
+# =============================================================================
+# CROSS-VALIDATION
+# =============================================================================
+cv:
+  strategy: "rolling_origin"    # Or "blocked_kfold"
+  test_years: [2017, 2018, 2019, 2020, 2021, 2022]
+  n_folds: 6
+  
+# =============================================================================
+# MODELS - BASELINES (Track A)
+# =============================================================================
+models:
+  baselines:
+    threshold:
+      multiplier: 2.0           # k in: alert if cases > μ + k*σ
+      neutral_probability: 0.5  # Fallback for missing threshold signal
+      
+    logistic:
+      C: 0.01                   # Regularization strength
+      solver: "lbfgs"
+      max_iter: 1000
+      class_weight: "balanced"
+      
+    poisson:
+      alpha: 0.01               # Regularization
+      
+    random_forest:
+      n_estimators: 100
+      max_depth: 15
+      min_samples_leaf: 5
+      n_jobs: -1
+      random_state: 42
+      
+    xgboost:
+      n_estimators: 100
+      max_depth: 5
+      learning_rate: 0.1
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_alpha: 0.01
+      reg_lambda: 1.0
+      random_state: 42
+
+# =============================================================================
+# MODELS - BAYESIAN (Track B)
+# =============================================================================
+  bayesian:
+    n_chains: 4
+    n_warmup: 1000
+    n_sampling: 2000
+    target_accept: 0.95
+    max_treedepth: 12
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  metrics:
+    - auc
+    - f1
+    - sensitivity
+    - specificity
+    - lead_time
+    - false_alarm_rate
+    - brier
+  random_seed: 42
+  probability_threshold: 0.5    # For binary predictions
+
+# =============================================================================
+# OUTPUT
+# =============================================================================
+output:
+  results_dir: "results"
+  predictions_dir: "results/predictions"
+  metrics_dir: "results/metrics"
+  plots_dir: "results/plots"
+  reports_dir: "results/reports"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/pipeline.log"

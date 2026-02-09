@@ -1,0 +1,11 @@
+FIGURE: Calibration Curves (Placeholder)
+============================================================
+
+WHAT IS SHOWN:
+Reliability diagram showing predicted probability vs observed outbreak fraction for XGBoost (and optionally Bayesian posterior predictive probability).
+
+WHY IT MATTERS:
+Points above the diagonal indicate underconfidence (observed rate higher than predicted). Points below indicate overconfidence. Perfect calibration lies on diagonal.
+
+CAVEATS:
+Placeholder - requires stored prediction probabilities. Bayesian model outputs risk Z_t, not probability; calibration interpretation differs.

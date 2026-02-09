@@ -1,0 +1,11 @@
+FIGURE: Calibration Curves (Reliability Diagram)
+============================================================
+
+WHAT IS SHOWN:
+Reliability diagram comparing XGBoost probabilities against observed outbreak frequency, alongside a Bayesian high-risk probability derived from latent Z summaries.
+
+WHY IT MATTERS:
+Points near the diagonal indicate good calibration. Deviations indicate over/under-confidence.
+
+CAVEATS:
+Bayesian curve uses P(Z > q80) (Normal approximation from z_mean/z_sd), which is a high-risk probability proxy rather than a direct posterior predictive outbreak probability.

@@ -1,0 +1,406 @@
+{
+  "timestamp": "2026-02-08T22:23:41.821441",
+  "model": "bayesian_state_space",
+  "model_version": "v3",
+  "phase": "Phase 5: Rolling-Origin CV Evaluation",
+  "mcmc_config": {
+    "n_warmup": 1000,
+    "n_samples": 1000,
+    "n_chains": 4,
+    "adapt_delta": 0.95,
+    "seed": 42
+  },
+  "aggregated": {
+    "n_folds": 6,
+    "n_failed": 0,
+    "auc_mean": 0.5147134611420325,
+    "auc_std": 0.2088193860361163,
+    "f1_mean": 0.06060606060606061,
+    "f1_std": 0.13551927136362363,
+    "sensitivity_mean": 0.047619047619047616,
+    "sensitivity_std": 0.10647942749998998,
+    "specificity_mean": 0.9761904761904763,
+    "specificity_std": 0.05323971374999501,
+    "brier_mean": 0.2565592895750083,
+    "brier_std": 0.16411463202526622
+  },
+  "fold_results": [
+    {
+      "fold": "fold_2017",
+      "test_year": 2017,
+      "n_train": 418,
+      "n_test": 11,
+      "n_positive": 8,
+      "n_negative": 3,
+      "threshold": 48.75,
+      "metrics": {
+        "auc": 0.2916666666666667,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.5628073068181819,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.02366,
+        "min_ess_bulk": 177.918,
+        "min_ess_tail": 503.73,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.59667,
+            "std": 0.0841038,
+            "rhat": 1.0024,
+            "ess_bulk": 726.911
+          },
+          "sigma_alpha": {
+            "mean": 0.667306,
+            "std": 0.0933487,
+            "rhat": 1.01617,
+            "ess_bulk": 326.057
+          },
+          "rho": {
+            "mean": 0.39606,
+            "std": 0.117996,
+            "rhat": 1.01723,
+            "ess_bulk": 326.974
+          },
+          "beta_temp": {
+            "mean": 0.0105913,
+            "std": 0.0247566,
+            "rhat": 1.00136,
+            "ess_bulk": 1546.12
+          },
+          "sigma": {
+            "mean": 0.550279,
+            "std": 0.0921333,
+            "rhat": 1.02366,
+            "ess_bulk": 177.918
+          },
+          "phi": {
+            "mean": 3.14149,
+            "std": 0.585717,
+            "rhat": 1.01179,
+            "ess_bulk": 206.741
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2018",
+      "test_year": 2018,
+      "n_train": 481,
+      "n_test": 18,
+      "n_positive": 7,
+      "n_negative": 11,
+      "threshold": 47.0,
+      "metrics": {
+        "auc": 0.8896103896103896,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.23641831944444439,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.01746,
+        "min_ess_bulk": 320.485,
+        "min_ess_tail": 734.099,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.56194,
+            "std": 0.0729575,
+            "rhat": 1.00314,
+            "ess_bulk": 918.325
+          },
+          "sigma_alpha": {
+            "mean": 0.602469,
+            "std": 0.0822249,
+            "rhat": 1.01346,
+            "ess_bulk": 478.13
+          },
+          "rho": {
+            "mean": 0.391122,
+            "std": 0.10263,
+            "rhat": 1.01746,
+            "ess_bulk": 417.942
+          },
+          "beta_temp": {
+            "mean": 0.0302669,
+            "std": 0.0221391,
+            "rhat": 1.00217,
+            "ess_bulk": 2615.31
+          },
+          "sigma": {
+            "mean": 0.573728,
+            "std": 0.0695467,
+            "rhat": 1.0159,
+            "ess_bulk": 320.485
+          },
+          "phi": {
+            "mean": 3.40003,
+            "std": 0.558129,
+            "rhat": 1.01095,
+            "ess_bulk": 345.381
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2019",
+      "test_year": 2019,
+      "n_train": 555,
+      "n_test": 21,
+      "n_positive": 7,
+      "n_negative": 14,
+      "threshold": 45.0,
+      "metrics": {
+        "auc": 0.47959183673469385,
+        "f1": 0.36363636363636365,
+        "sensitivity": 0.2857142857142857,
+        "specificity": 0.8571428571428571,
+        "brier": 0.2641302142857143,
+        "precision": 0.5,
+        "false_alarm_rate": 0.5
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.02712,
+        "min_ess_bulk": 229.597,
+        "min_ess_tail": 464.143,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.54606,
+            "std": 0.0694162,
+            "rhat": 1.00857,
+            "ess_bulk": 570.504
+          },
+          "sigma_alpha": {
+            "mean": 0.583206,
+            "std": 0.0744097,
+            "rhat": 1.00855,
+            "ess_bulk": 411.594
+          },
+          "rho": {
+            "mean": 0.362839,
+            "std": 0.0971787,
+            "rhat": 1.00497,
+            "ess_bulk": 360.907
+          },
+          "beta_temp": {
+            "mean": 0.0234917,
+            "std": 0.0196372,
+            "rhat": 1.00113,
+            "ess_bulk": 2004.26
+          },
+          "sigma": {
+            "mean": 0.559976,
+            "std": 0.0636186,
+            "rhat": 1.02712,
+            "ess_bulk": 229.597
+          },
+          "phi": {
+            "mean": 3.71672,
+            "std": 0.61559,
+            "rhat": 1.02557,
+            "ess_bulk": 233.891
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2020",
+      "test_year": 2020,
+      "n_train": 626,
+      "n_test": 9,
+      "n_positive": 2,
+      "n_negative": 7,
+      "threshold": 45.0,
+      "metrics": {
+        "auc": 0.35714285714285715,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.19923980555555557,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.01982,
+        "min_ess_bulk": 253.732,
+        "min_ess_tail": 579.22,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.51861,
+            "std": 0.0642302,
+            "rhat": 1.00145,
+            "ess_bulk": 1664.18
+          },
+          "sigma_alpha": {
+            "mean": 0.588239,
+            "std": 0.066727,
+            "rhat": 1.00423,
+            "ess_bulk": 911.611
+          },
+          "rho": {
+            "mean": 0.342841,
+            "std": 0.0988475,
+            "rhat": 1.00737,
+            "ess_bulk": 554.052
+          },
+          "beta_temp": {
+            "mean": 0.0137345,
+            "std": 0.0184002,
+            "rhat": 1.00056,
+            "ess_bulk": 4497.48
+          },
+          "sigma": {
+            "mean": 0.545646,
+            "std": 0.0575731,
+            "rhat": 1.01982,
+            "ess_bulk": 253.732
+          },
+          "phi": {
+            "mean": 3.86818,
+            "std": 0.58534,
+            "rhat": 1.01824,
+            "ess_bulk": 284.629
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2021",
+      "test_year": 2021,
+      "n_train": 647,
+      "n_test": 13,
+      "n_positive": 4,
+      "n_negative": 9,
+      "threshold": 44.0,
+      "metrics": {
+        "auc": 0.5555555555555556,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.27279109134615387,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.01757,
+        "min_ess_bulk": 294.063,
+        "min_ess_tail": 645.575,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.50386,
+            "std": 0.0657425,
+            "rhat": 1.005,
+            "ess_bulk": 1107.29
+          },
+          "sigma_alpha": {
+            "mean": 0.603273,
+            "std": 0.0671379,
+            "rhat": 1.00598,
+            "ess_bulk": 814.931
+          },
+          "rho": {
+            "mean": 0.356864,
+            "std": 0.0958975,
+            "rhat": 1.00541,
+            "ess_bulk": 512.693
+          },
+          "beta_temp": {
+            "mean": 0.0192403,
+            "std": 0.0181841,
+            "rhat": 1.00199,
+            "ess_bulk": 3701.67
+          },
+          "sigma": {
+            "mean": 0.539482,
+            "std": 0.0574813,
+            "rhat": 1.01757,
+            "ess_bulk": 294.063
+          },
+          "phi": {
+            "mean": 3.8319,
+            "std": 0.569642,
+            "rhat": 1.01381,
+            "ess_bulk": 344.994
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2022",
+      "test_year": 2022,
+      "n_train": 678,
+      "n_test": 2,
+      "n_positive": 0,
+      "n_negative": 2,
+      "threshold": 43.0,
+      "metrics": {
+        "auc": null,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.003968999999999997,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.0119,
+        "min_ess_bulk": 265.522,
+        "min_ess_tail": 543.685,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.46735,
+            "std": 0.0652856,
+            "rhat": 1.00267,
+            "ess_bulk": 1148.71
+          },
+          "sigma_alpha": {
+            "mean": 0.594085,
+            "std": 0.0640232,
+            "rhat": 1.00428,
+            "ess_bulk": 675.737
+          },
+          "rho": {
+            "mean": 0.357227,
+            "std": 0.0920161,
+            "rhat": 1.00226,
+            "ess_bulk": 431.876
+          },
+          "beta_temp": {
+            "mean": 0.0327021,
+            "std": 0.0176827,
+            "rhat": 0.999619,
+            "ess_bulk": 3058.24
+          },
+          "sigma": {
+            "mean": 0.560268,
+            "std": 0.055983,
+            "rhat": 1.0079,
+            "ess_bulk": 265.522
+          },
+          "phi": {
+            "mean": 3.93171,
+            "std": 0.596434,
+            "rhat": 1.00553,
+            "ess_bulk": 329.31
+          }
+        }
+      }
+    }
+  ],
+  "comparison": {
+    "v1.1_xgboost_auc": 0.759,
+    "bayesian_auc": 0.5147134611420325,
+    "delta": -0.24428653885796747
+  }
+}

@@ -1,0 +1,11 @@
+FIGURE: Median Lead Time by CV Fold
+============================================================
+
+WHAT IS SHOWN:
+Bar chart comparing median lead time (in weeks) for Bayesian and XGBoost models across each rolling-origin CV fold. Episode count (n) shown above each fold.
+
+WHY IT MATTERS:
+Fold-level variation reflects year-to-year differences in outbreak patterns. Some folds may have zero outbreaks or models that never warned (shown as 0).
+
+CAVEATS:
+Folds with zero episodes or models that never warned show 0 median. Small n per fold limits statistical power.

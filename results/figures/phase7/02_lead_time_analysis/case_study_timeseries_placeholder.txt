@@ -1,0 +1,15 @@
+FIGURE: Case Study Time Series (Placeholder)
+============================================================
+
+WHAT IS SHOWN:
+This figure will show 2-3 case study districts with:
+- Panel A: Observed case counts with outbreak threshold
+- Panel B: Bayesian latent risk Z_t with crossing threshold
+- Panel C: XGBoost probability P_t with 0.5 threshold
+Vertical lines indicate first threshold crossings.
+
+WHY IT MATTERS:
+Case studies illustrate HOW the models detect outbreaks. Bayesian Z_t may rise gradually before cases spike, while XGBoost P_t may respond more abruptly.
+
+CAVEATS:
+Placeholder - requires per-district prediction storage. See experiments/08_case_study_plots.py for implementation.

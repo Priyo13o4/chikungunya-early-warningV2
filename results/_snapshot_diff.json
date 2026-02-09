@@ -1,0 +1,455 @@
+{
+  "added": [
+    "1770557154 3560 results/_snapshot_before_rerun.txt",
+    "1770563679 7909 results/predictions/baseline_cv_predictions_threshold.parquet",
+    "1770563679 7936 results/predictions/baseline_cv_predictions_logistic.parquet",
+    "1770563680 7961 results/predictions/baseline_cv_predictions_random_forest.parquet",
+    "1770563681 13053 results/metrics/baseline_comparison.json",
+    "1770563681 7820 results/predictions/baseline_cv_predictions_xgboost.parquet",
+    "1770569621 10168 results/metrics/bayesian_cv_results.json",
+    "1770569715 1394 results/analysis/lead_time_analysis_metadata.json",
+    "1770569715 19218 results/analysis/lead_time_predictions_p75.parquet",
+    "1770569715 434 results/analysis/lead_time_summary_overall_p75.csv",
+    "1770569715 540 results/analysis/lead_time_detail_p75.csv",
+    "1770569715 611 results/analysis/lead_time_summary_by_fold_p75.csv",
+    "1770569716 144786 results/figures/phase7/01_trackA_performance/auc_comparison_bar.png",
+    "1770569716 173432 results/figures/phase7/02_lead_time_analysis/lead_time_distribution.png",
+    "1770569716 679 results/figures/phase7/02_lead_time_analysis/lead_time_distribution.txt",
+    "1770569716 754 results/figures/phase7/01_trackA_performance/auc_comparison_bar.txt",
+    "1770569717 110890 results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.png",
+    "1770569717 164094 results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.png",
+    "1770569717 1653 results/figures/phase7/README.md",
+    "1770569717 265425 results/figures/phase7/03_calibration_uncertainty/calibration_curves.png",
+    "1770569717 455303 results/figures/phase7/02_lead_time_analysis/case_study_timeseries.png",
+    "1770569717 530 results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.txt",
+    "1770569717 552 results/figures/phase7/04_decision_usefulness/decision_state_timeline.txt",
+    "1770569717 562 results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.txt",
+    "1770569717 588 results/figures/phase7/03_calibration_uncertainty/calibration_curves.txt",
+    "1770569717 696 results/figures/phase7/02_lead_time_analysis/case_study_timeseries.txt",
+    "1770569717 82922 results/figures/phase7/04_decision_usefulness/decision_state_timeline.png",
+    "1770569718 9255 results/analysis/decision_simulation_p75.json",
+    "1770569719 1249 results/analysis/sparsity_report/feature_strict_impact.csv",
+    "1770569719 1308 results/analysis/sparsity_report/missingness_labeled.csv",
+    "1770569719 1588 results/analysis/sparsity_report/missingness_overall.csv",
+    "1770569719 17118 results/analysis/sparsity_report/district_year_week_counts.csv",
+    "1770569719 184 results/analysis/sparsity_report/label_missing_reason_counts.csv",
+    "1770569719 24828 results/analysis/fusion_results_p75.json",
+    "1770569719 3316 results/analysis/sparsity_report/SPARSITY_REPORT.md",
+    "1770569719 359 results/analysis/sparsity_report/label_availability_by_year.csv",
+    "1770569719 6290 results/analysis/sparsity_report/label_availability_by_district.csv",
+    "1770569833 6952 results/analysis/comprehensive_metrics.json",
+    "1770571010 0 results/_snapshot_after_rerun.txt"
+  ],
+  "removed": [
+    "1770307334 10170 results/metrics/bayesian_cv_results.json",
+    "1770307334 12287 results/metrics/baseline_comparison.json",
+    "1770319646 929 results/analysis/lead_time_analysis_metadata.json",
+    "1770534283 434 results/analysis/lead_time_summary_overall_p75.csv",
+    "1770534283 464 results/analysis/lead_time_summary_by_fold_p75.csv",
+    "1770534283 545 results/analysis/lead_time_detail_p75.csv",
+    "1770534629 122935 results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.png",
+    "1770534629 145012 results/figures/phase7/01_trackA_performance/auc_comparison_bar.png",
+    "1770534629 173432 results/figures/phase7/02_lead_time_analysis/lead_time_distribution.png",
+    "1770534629 562 results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.txt",
+    "1770534629 580 results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.txt",
+    "1770534629 754 results/figures/phase7/01_trackA_performance/auc_comparison_bar.txt",
+    "1770534629 813 results/figures/phase7/02_lead_time_analysis/lead_time_distribution.txt",
+    "1770534629 90487 results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.png",
+    "1770534630 124953 results/figures/phase7/04_decision_usefulness/decision_state_timeline.png",
+    "1770534630 1922 results/figures/phase7/README.md",
+    "1770534630 292419 results/figures/phase7/03_calibration_uncertainty/calibration_curves.png",
+    "1770534630 445972 results/figures/phase7/02_lead_time_analysis/case_study_timeseries.png",
+    "1770534630 588 results/figures/phase7/03_calibration_uncertainty/calibration_curves.txt",
+    "1770534630 619 results/figures/phase7/04_decision_usefulness/decision_state_timeline.txt",
+    "1770534630 696 results/figures/phase7/02_lead_time_analysis/case_study_timeseries.txt",
+    "1770535973 15355 results/analysis/lead_time_predictions_p75.parquet",
+    "1770536038 5138 results/analysis/decision_simulation_p75.json",
+    "1770536040 1249 results/analysis/sparsity_report/feature_strict_impact.csv",
+    "1770536040 1308 results/analysis/sparsity_report/missingness_labeled.csv",
+    "1770536040 13539 results/analysis/fusion_results_p75.json",
+    "1770536040 1588 results/analysis/sparsity_report/missingness_overall.csv",
+    "1770536040 17118 results/analysis/sparsity_report/district_year_week_counts.csv",
+    "1770536040 184 results/analysis/sparsity_report/label_missing_reason_counts.csv",
+    "1770536040 2222 results/analysis/comprehensive_metrics.json",
+    "1770536040 3316 results/analysis/sparsity_report/SPARSITY_REPORT.md",
+    "1770536040 359 results/analysis/sparsity_report/label_availability_by_year.csv",
+    "1770536040 6290 results/analysis/sparsity_report/label_availability_by_district.csv",
+    "1770557154 0 results/_snapshot_before_rerun.txt"
+  ],
+  "changed": [
+    [
+      "results/_snapshot_before_rerun.txt",
+      [
+        1770557154,
+        0
+      ],
+      [
+        1770557154,
+        3560
+      ]
+    ],
+    [
+      "results/figures/phase7/01_trackA_performance/auc_comparison_bar.txt",
+      [
+        1770534629,
+        754
+      ],
+      [
+        1770569716,
+        754
+      ]
+    ],
+    [
+      "results/figures/phase7/04_decision_usefulness/decision_state_timeline.txt",
+      [
+        1770534630,
+        619
+      ],
+      [
+        1770569717,
+        552
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/case_study_timeseries.txt",
+      [
+        1770534630,
+        696
+      ],
+      [
+        1770569717,
+        696
+      ]
+    ],
+    [
+      "results/figures/phase7/03_calibration_uncertainty/calibration_curves.txt",
+      [
+        1770534630,
+        588
+      ],
+      [
+        1770569717,
+        588
+      ]
+    ],
+    [
+      "results/figures/phase7/README.md",
+      [
+        1770534630,
+        1922
+      ],
+      [
+        1770569717,
+        1653
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/label_availability_by_year.csv",
+      [
+        1770536040,
+        359
+      ],
+      [
+        1770569719,
+        359
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/district_year_week_counts.csv",
+      [
+        1770536040,
+        17118
+      ],
+      [
+        1770569719,
+        17118
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/label_missing_reason_counts.csv",
+      [
+        1770536040,
+        184
+      ],
+      [
+        1770569719,
+        184
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/lead_time_distribution.png",
+      [
+        1770534629,
+        173432
+      ],
+      [
+        1770569716,
+        173432
+      ]
+    ],
+    [
+      "results/figures/phase7/03_calibration_uncertainty/calibration_curves.png",
+      [
+        1770534630,
+        292419
+      ],
+      [
+        1770569717,
+        265425
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/case_study_timeseries.png",
+      [
+        1770534630,
+        445972
+      ],
+      [
+        1770569717,
+        455303
+      ]
+    ],
+    [
+      "results/analysis/decision_simulation_p75.json",
+      [
+        1770536038,
+        5138
+      ],
+      [
+        1770569718,
+        9255
+      ]
+    ],
+    [
+      "results/analysis/lead_time_detail_p75.csv",
+      [
+        1770534283,
+        545
+      ],
+      [
+        1770569715,
+        540
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.png",
+      [
+        1770534629,
+        122935
+      ],
+      [
+        1770569717,
+        110890
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.txt",
+      [
+        1770534629,
+        562
+      ],
+      [
+        1770569717,
+        562
+      ]
+    ],
+    [
+      "results/analysis/lead_time_predictions_p75.parquet",
+      [
+        1770535973,
+        15355
+      ],
+      [
+        1770569715,
+        19218
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/missingness_labeled.csv",
+      [
+        1770536040,
+        1308
+      ],
+      [
+        1770569719,
+        1308
+      ]
+    ],
+    [
+      "results/figures/phase7/01_trackA_performance/auc_comparison_bar.png",
+      [
+        1770534629,
+        145012
+      ],
+      [
+        1770569716,
+        144786
+      ]
+    ],
+    [
+      "results/analysis/fusion_results_p75.json",
+      [
+        1770536040,
+        13539
+      ],
+      [
+        1770569719,
+        24828
+      ]
+    ],
+    [
+      "results/metrics/bayesian_cv_results.json",
+      [
+        1770307334,
+        10170
+      ],
+      [
+        1770569621,
+        10168
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/SPARSITY_REPORT.md",
+      [
+        1770536040,
+        3316
+      ],
+      [
+        1770569719,
+        3316
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/feature_strict_impact.csv",
+      [
+        1770536040,
+        1249
+      ],
+      [
+        1770569719,
+        1249
+      ]
+    ],
+    [
+      "results/analysis/lead_time_analysis_metadata.json",
+      [
+        1770319646,
+        929
+      ],
+      [
+        1770569715,
+        1394
+      ]
+    ],
+    [
+      "results/metrics/baseline_comparison.json",
+      [
+        1770307334,
+        12287
+      ],
+      [
+        1770563681,
+        13053
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/label_availability_by_district.csv",
+      [
+        1770536040,
+        6290
+      ],
+      [
+        1770569719,
+        6290
+      ]
+    ],
+    [
+      "results/analysis/comprehensive_metrics.json",
+      [
+        1770536040,
+        2222
+      ],
+      [
+        1770569833,
+        6952
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/per_fold_median_lead.png",
+      [
+        1770534629,
+        90487
+      ],
+      [
+        1770569717,
+        164094
+      ]
+    ],
+    [
+      "results/analysis/lead_time_summary_overall_p75.csv",
+      [
+        1770534283,
+        434
+      ],
+      [
+        1770569715,
+        434
+      ]
+    ],
+    [
+      "results/analysis/lead_time_summary_by_fold_p75.csv",
+      [
+        1770534283,
+        464
+      ],
+      [
+        1770569715,
+        611
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/differential_lead_histogram.txt",
+      [
+        1770534629,
+        580
+      ],
+      [
+        1770569717,
+        530
+      ]
+    ],
+    [
+      "results/analysis/sparsity_report/missingness_overall.csv",
+      [
+        1770536040,
+        1588
+      ],
+      [
+        1770569719,
+        1588
+      ]
+    ],
+    [
+      "results/figures/phase7/04_decision_usefulness/decision_state_timeline.png",
+      [
+        1770534630,
+        124953
+      ],
+      [
+        1770569717,
+        82922
+      ]
+    ],
+    [
+      "results/figures/phase7/02_lead_time_analysis/lead_time_distribution.txt",
+      [
+        1770534629,
+        813
+      ],
+      [
+        1770569716,
+        679
+      ]
+    ]
+  ]
+}

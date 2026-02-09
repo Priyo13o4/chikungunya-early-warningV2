@@ -1,0 +1,11 @@
+FIGURE: Case Study Time Series
+============================================================
+
+WHAT IS SHOWN:
+Two-panel case study for a representative district. Panel A shows observed cases and the outbreak threshold. Panel B shows XGBoost probabilities and a Bayesian high-risk probability derived from latent Z summaries.
+
+WHY IT MATTERS:
+Case studies illustrate how warning signals evolve relative to observed case escalation. Bayesian latent risk can provide a smoother trajectory; ML probabilities can respond sharply to feature patterns.
+
+CAVEATS:
+Bayesian probability here is P(Z > q80) using a Normal approximation from (z_mean, z_sd); it is not a direct posterior predictive P(outbreak).

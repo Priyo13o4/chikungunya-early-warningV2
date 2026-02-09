@@ -1,0 +1,11 @@
+FIGURE: Decision State Timeline
+============================================================
+
+WHAT IS SHOWN:
+Binary alert states over weeks for a single district-year. Rows show outbreak weeks (cases above threshold), Bayesian alerts, and XGBoost alerts, computed from stored predictions and thresholds.
+
+WHY IT MATTERS:
+Shows how model alerts align with observed outbreak timing in a real district-year sequence.
+
+CAVEATS:
+Uses the first available outbreak episode in lead-time outputs. Thresholds come from the corresponding lead_time_detail_p*.csv.

@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-02-08T12:36:00.391638",
+  "phase": "Experiment 08 - Decision Layer Simulation (prediction-level)",
+  "input": {
+    "predictions_parquet": "/Volumes/My Drive/Priyodip/college notes and stuff/sem6/research work/implemnetation/chikungunya-early-warning/results/analysis/lead_time_predictions_p75.parquet",
+    "probability_threshold": 0.5,
+    "yellow_threshold": 0.5,
+    "red_threshold": 0.8,
+    "risk_quantile": 0.8
+  },
+  "fold_results": {
+    "fold_2017": {
+      "n_rows": 12,
+      "zone_counts": {
+        "GREEN": 9,
+        "RED": 2,
+        "YELLOW": 1
+      },
+      "outbreak_rate_by_zone": {
+        "GREEN": 0.6666666666666666,
+        "RED": 1.0,
+        "YELLOW": 1.0
+      },
+      "metrics": {
+        "alert_any": {
+          "auc": 0.6666666666666666,
+          "aupr": 0.8333333333333333,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        },
+        "alert_red": {
+          "auc": 0.6111111111111112,
+          "aupr": 0.8055555555555556,
+          "precision": 1.0,
+          "recall": 0.2222222222222222,
+          "f1": 0.36363636363636365
+        },
+        "p_highrisk": {
+          "auc": 0.3333333333333333,
+          "aupr": 0.7847883597883598,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        }
+      }
+    },
+    "fold_2019": {
+      "n_rows": 21,
+      "zone_counts": {
+        "GREEN": 16,
+        "RED": 4,
+        "YELLOW": 1
+      },
+      "outbreak_rate_by_zone": {
+        "GREEN": 0.1875,
+        "RED": 0.75,
+        "YELLOW": 1.0
+      },
+      "metrics": {
+        "alert_any": {
+          "auc": 0.75,
+          "aupr": 0.6,
+          "precision": 0.8,
+          "recall": 0.5714285714285714,
+          "f1": 0.6666666666666666
+        },
+        "alert_red": {
+          "auc": 0.6785714285714286,
+          "aupr": 0.5119047619047619,
+          "precision": 0.75,
+          "recall": 0.42857142857142855,
+          "f1": 0.5454545454545454
+        },
+        "p_highrisk": {
+          "auc": 0.7857142857142858,
+          "aupr": 0.689455782312925,
+          "precision": 0.8,
+          "recall": 0.5714285714285714,
+          "f1": 0.6666666666666666
+        }
+      }
+    },
+    "fold_2021": {
+      "n_rows": 14,
+      "zone_counts": {
+        "GREEN": 11,
+        "RED": 2,
+        "YELLOW": 1
+      },
+      "outbreak_rate_by_zone": {
+        "GREEN": 0.18181818181818182,
+        "RED": 1.0,
+        "YELLOW": 1.0
+      },
+      "metrics": {
+        "alert_any": {
+          "auc": 0.8,
+          "aupr": 0.7428571428571429,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75
+        },
+        "alert_red": {
+          "auc": 0.7,
+          "aupr": 0.6142857142857143,
+          "precision": 1.0,
+          "recall": 0.4,
+          "f1": 0.5714285714285714
+        },
+        "p_highrisk": {
+          "auc": 0.7777777777777779,
+          "aupr": 0.7909090909090908,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75
+        }
+      }
+    }
+  }
+}

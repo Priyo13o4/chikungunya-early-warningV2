@@ -1,0 +1,649 @@
+#!/usr/bin/env python3
+"""
+Experiment 05: Full Rolling-Origin CV Evaluation of Bayesian Model
+
+Phase 5: Evaluate v3 Bayesian model across all CV folds.
+
+This script:
+1. Loads processed features (same as v1.1)
+2. Uses identical rolling-origin CV splits (2017-2022)
+3. For each fold:
+   - Trains v3 Bayesian state-space model
+   - Extracts outbreak probabilities
+   - Computes metrics (AUC, F1, Sens, Spec, Brier)
+   - Logs MCMC diagnostics
+4. Aggregates results across folds
+5. Saves results for comparison against v1.1 baselines
+
+Reference: Phase 5 evaluation specification
+Uses v3 artifacts directly (stan_models/, state_space.py)
+"""
+import sys
+import json
+import argparse
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+import numpy as np
+import pandas as pd
+
+# Add project root to path FIRST (resolve to handle symlinks)
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
+
+# Import main project modules
+from src.config import load_config, get_project_root, get_repo_root
+from src.evaluation.cv import create_rolling_origin_splits, CVFold
+from src.evaluation.metrics import compute_all_metrics, print_metrics
+
+
+# =============================================================================
+# CONSTANTS (matching v3 stabilized settings)
+# =============================================================================
+
+MCMC_CONFIG = {
+    'n_warmup': 1000,
+    'n_samples': 1000,
+    'n_chains': 4,
+    'adapt_delta': 0.95,
+    'seed': 42
+}
+
+# v1.1 XGBoost benchmark (for comparison)
+V1_1_XGBOOST_AUC = 0.759
+
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+def get_feature_columns(df: pd.DataFrame) -> List[str]:
+    """Get all feature column names."""
+    return [c for c in df.columns if c.startswith('feat_')]
+
+
+def get_stan_model_path() -> Path:
+    """Get path to local Stan model file (standalone V2).
+    
+    NOTE: v6 analysis uses Vishnu's v3 stabilized model:
+    - Version: 0.2 (vs 0.1 in root-level)
+    - phi constrained to lower=0.1 (prevents boundary issues)
+    - rho prior tightened: normal(0.7, 0.10) vs normal(0.7, 0.15)
+    - Better convergence with fewer divergent transitions
+    """
+    repo_root = get_repo_root()
+    stan_path = repo_root / "stan_models" / "hierarchical_ews_v01.stan"
+    if not stan_path.exists():
+        raise FileNotFoundError(f"Stan model not found at {stan_path}")
+    return stan_path
+
+
+def prepare_valid_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Prepare data for Bayesian model.
+    Filters to rows with required columns for state-space model.
+    """
+    required_cols = ['state', 'district', 'year', 'week', 'cases']
+    valid_df = df.dropna(subset=required_cols).copy()
+    
+    # Temperature is needed for climate effect
+    if 'temp_celsius' in valid_df.columns:
+        valid_df = valid_df.dropna(subset=['temp_celsius'])
+    
+    return valid_df
+
+
+def compute_outbreak_probability(
+    model,
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+    feature_cols: List[str],
+    outbreak_percentile: int
+) -> np.ndarray:
+    """
+    Compute outbreak probabilities for test set.
+    
+    Uses posterior predictive P(cases > p_k_train) as outbreak probability,
+    where k is the config-driven outbreak percentile.
+    
+    Args:
+        model: Fitted BayesianStateSpace model
+        train_df: Training data (for threshold calculation)
+        test_df: Test data
+        feature_cols: Feature columns
+        
+    Returns:
+        Array of outbreak probabilities for test samples
+    """
+    # Get posterior predictive samples from training fit
+    y_rep = model.get_posterior_predictive()  # Shape: (n_draws, N_train)
+    
+    # Compute threshold: config percentile of non-zero training cases
+    train_cases = train_df['cases'].values
+    nonzero_cases = train_cases[train_cases > 0]
+    if outbreak_percentile is None:
+        raise ValueError("outbreak_percentile must be provided from config.")
+    if len(nonzero_cases) > 0:
+        threshold = np.percentile(nonzero_cases, outbreak_percentile)
+    else:
+        threshold = 1.0
+    
+    # For test set, we need to refit or use the last time point distributions
+    # Since we're using a state-space model, we extrapolate from the latent states
+    # For now, use the predict_proba method from the model
+    
+    X_test = test_df[feature_cols].values
+    proba = model.predict_proba(X_test, df=test_df)
+    
+    return proba
+
+
+def evaluate_single_fold(
+    fold: CVFold,
+    valid_df: pd.DataFrame,
+    feature_cols: List[str],
+    target_col: str = 'label_outbreak',
+    mcmc_config: Dict = MCMC_CONFIG,
+    outbreak_percentile: int = None,
+    probability_threshold: float = None
+) -> Dict[str, Any]:
+    """
+    Evaluate Bayesian model on a single CV fold.
+    
+    Args:
+        fold: CVFold object with train/test indices
+        valid_df: DataFrame with valid samples
+        feature_cols: Feature column names
+        target_col: Target column for evaluation
+        mcmc_config: MCMC configuration
+        
+    Returns:
+        Dictionary with metrics and diagnostics
+    """
+    if outbreak_percentile is None or probability_threshold is None:
+        raise ValueError("outbreak_percentile and probability_threshold must be config-driven.")
+
+    # Import Bayesian model from v3
+    from src.models.bayesian.state_space import BayesianStateSpace
+    
+    # Get train/test data
+    train_df = valid_df.iloc[fold.train_idx].copy()
+    test_df = valid_df.iloc[fold.test_idx].copy()
+    
+    print(f"\n{'='*60}")
+    print(f"FOLD: {fold.fold_name} (test year: {fold.test_year})")
+    print(f"{'='*60}")
+    print(f"  Train samples: {len(train_df)} ({train_df['year'].min()}-{train_df['year'].max()})")
+    print(f"  Test samples: {len(test_df)}")
+    print(f"  Districts in train: {train_df['district'].nunique()}")
+    print("  NOTE: Bayesian evaluation reflects latent risk persistence rather than point-forecast accuracy.")
+    
+    # Check if test set has valid labels
+    if target_col not in test_df.columns:
+        print(f"  WARNING: {target_col} not in test data!")
+        return {'error': f'Missing {target_col}', 'fold': fold.fold_name}
+    
+    # Get true labels
+    test_labels = test_df[target_col].dropna()
+    if len(test_labels) == 0:
+        print(f"  WARNING: No valid labels in test set!")
+        return {'error': 'No valid labels', 'fold': fold.fold_name}
+    
+    # Initialize model with v3 Stan file
+    stan_file = get_stan_model_path()
+    model_config = {
+        **mcmc_config,
+        'stan_file': str(stan_file),
+        'outbreak_percentile': outbreak_percentile,
+    }
+    
+    model = BayesianStateSpace(config=model_config)
+    
+    # Prepare training data
+    X_train = train_df[feature_cols].values
+    y_train = train_df['cases'].values
+    
+    print(f"\n  Fitting Bayesian model...")
+    print(f"  MCMC: {mcmc_config['n_chains']} chains × {mcmc_config['n_warmup']} warmup × {mcmc_config['n_samples']} samples")
+    print(f"  adapt_delta: {mcmc_config['adapt_delta']}")
+    
+    try:
+        # Fit model
+        model.fit(X_train, y_train, df=train_df, feature_cols=feature_cols)
+        
+        # Get diagnostics
+        diagnostics = model.get_diagnostics()
+        
+        print(f"\n  MCMC Diagnostics:")
+        print(f"    Divergences: {diagnostics['n_divergences']}")
+        print(f"    Max R-hat: {diagnostics['max_rhat']:.4f}")
+        print(f"    Min ESS (bulk): {diagnostics['min_ess_bulk']:.0f}")
+        print(f"    Min ESS (tail): {diagnostics['min_ess_tail']:.0f}")
+        
+        # Compute outbreak probabilities for test set
+        # Note: The Bayesian model predicts on training data only by default
+        # We need to extract probabilities aligned with test set
+        
+        # Get predicted probabilities
+        # For state-space model, predict_proba uses posterior predictive
+        y_pred_proba = model.predict_proba(None, df=train_df)
+        
+        # The model fits on train_df, so y_pred_proba corresponds to train indices
+        # For evaluation, we need to compute metrics on overlapping data
+        # Since test_df is a future period, we use the last observations as proxies
+        
+        # Alternative: Use the outbreak probability threshold approach
+        # P(outbreak) = P(predicted_cases > config threshold)
+        y_rep = model.get_posterior_predictive()  # Shape: (n_draws, N_train)
+        
+        # For test evaluation, we need to match indices
+        # Since this is a temporal model, test set is the future
+        # We'll use the posterior predictive for the TRAINING data
+        # and compute metrics on the training-period labels as a proxy
+        
+        # Actually, for proper evaluation, we should:
+        # 1. Fit on train (past)
+        # 2. Predict on test (future) - requires extrapolation
+        
+        # For now, compute metrics on the overlapping test indices
+        # by aligning predictions with the test DataFrame
+        
+        # Get indices that exist in test
+        test_indices = test_df.index.tolist()
+        
+        # Since test_df was created from valid_df.iloc[fold.test_idx],
+        # we need to map back to get probabilities
+        
+        # Simpler approach: Refit including test data and extract test predictions
+        # But this would be data leakage!
+        
+        # Correct approach for state-space model:
+        # The model predicts y_rep for the data it was fitted on.
+        # For out-of-sample prediction, we need to forecast forward.
+        
+        # For this evaluation, we'll use a practical approach:
+        # Compute the model's outbreak probability based on exceeding threshold
+        # and align with actual test labels.
+        # NOTE: This reflects latent risk persistence (district-level carryover),
+        # not point-forecast accuracy on future weeks.
+        
+        # Get training case threshold (config-driven percentile)
+        train_cases = train_df['cases'].values
+        nonzero = train_cases[train_cases > 0]
+        threshold = np.percentile(nonzero, outbreak_percentile) if len(nonzero) > 0 else 1
+        
+        # Posterior predictive probability of exceeding threshold
+        # This is computed over training data
+        prob_exceed = (y_rep > threshold).mean(axis=0)
+        
+        # For test set evaluation, we need to handle the temporal gap
+        # Since we can't directly predict test (future), we evaluate
+        # how well the model's final time-point predictions generalize
+        
+        # Match test samples to training by district
+        # This is imperfect but allows metric computation
+        
+        test_eval_df = test_df.dropna(subset=[target_col]).copy()
+        y_true = test_eval_df[target_col].values.astype(int)
+        
+        # Create district-level probabilities from training
+        train_df_with_prob = train_df.copy()
+        train_df_with_prob['pred_proba'] = prob_exceed
+        
+        # Get last available probability per district
+        district_probs = train_df_with_prob.groupby(['state', 'district']).agg({
+            'pred_proba': 'last',
+            'year': 'max'
+        }).reset_index()
+        
+        # Merge with test data
+        test_with_probs = test_eval_df.merge(
+            district_probs[['state', 'district', 'pred_proba']],
+            on=['state', 'district'],
+            how='left'
+        )
+        
+        # Fill missing with mean probability
+        mean_prob = prob_exceed.mean()
+        test_with_probs['pred_proba'] = test_with_probs['pred_proba'].fillna(mean_prob)
+        
+        y_pred_proba_test = test_with_probs['pred_proba'].values
+        y_true_test = test_with_probs[target_col].values.astype(int)
+        
+        # Compute metrics
+        metrics = compute_all_metrics(y_true_test, y_pred_proba_test, threshold=probability_threshold)
+        
+        print(f"\n  Metrics:")
+        print(f"    AUC: {metrics['auc']:.3f}")
+        print(f"    F1: {metrics['f1']:.3f}")
+        print(f"    Sensitivity: {metrics['sensitivity']:.3f}")
+        print(f"    Specificity: {metrics['specificity']:.3f}")
+        print(f"    Brier: {metrics['brier']:.3f}")
+        
+        # Compile results
+        result = {
+            'fold': fold.fold_name,
+            'test_year': fold.test_year,
+            'n_train': len(train_df),
+            'n_test': len(test_with_probs),
+            'n_positive': int(y_true_test.sum()),
+            'n_negative': int(len(y_true_test) - y_true_test.sum()),
+            'threshold': float(threshold),
+            'metrics': {
+                'auc': float(metrics['auc']),
+                'f1': float(metrics['f1']),
+                'sensitivity': float(metrics['sensitivity']),
+                'specificity': float(metrics['specificity']),
+                'brier': float(metrics['brier']),
+                'precision': float(metrics['precision']),
+                'false_alarm_rate': float(metrics['false_alarm_rate'])
+            },
+            'diagnostics': {
+                'n_divergences': diagnostics['n_divergences'],
+                'max_rhat': float(diagnostics['max_rhat']),
+                'min_ess_bulk': float(diagnostics['min_ess_bulk']),
+                'min_ess_tail': float(diagnostics['min_ess_tail']),
+                'parameter_summary': {
+                    k: {kk: float(vv) for kk, vv in v.items()}
+                    for k, v in diagnostics['parameter_summary'].items()
+                }
+            }
+        }
+        
+        return result
+        
+    except Exception as e:
+        print(f"\n  ERROR: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {
+            'fold': fold.fold_name,
+            'test_year': fold.test_year,
+            'error': str(e)
+        }
+
+
+def aggregate_results(fold_results: List[Dict]) -> Dict[str, Any]:
+    """
+    Aggregate metrics across CV folds.
+    
+    Args:
+        fold_results: List of per-fold result dictionaries
+        
+    Returns:
+        Aggregated statistics
+    """
+    # Filter successful folds
+    valid_results = [r for r in fold_results if 'error' not in r]
+    
+    if len(valid_results) == 0:
+        return {'error': 'No successful folds'}
+    
+    # Extract metrics
+    aucs = [r['metrics']['auc'] for r in valid_results if not np.isnan(r['metrics']['auc'])]
+    f1s = [r['metrics']['f1'] for r in valid_results]
+    sensitivities = [r['metrics']['sensitivity'] for r in valid_results]
+    specificities = [r['metrics']['specificity'] for r in valid_results]
+    briers = [r['metrics']['brier'] for r in valid_results if not np.isnan(r['metrics']['brier'])]
+    
+    aggregated = {
+        'n_folds': len(valid_results),
+        'n_failed': len(fold_results) - len(valid_results),
+        'auc_mean': float(np.mean(aucs)) if aucs else np.nan,
+        'auc_std': float(np.std(aucs)) if aucs else np.nan,
+        'f1_mean': float(np.mean(f1s)),
+        'f1_std': float(np.std(f1s)),
+        'sensitivity_mean': float(np.mean(sensitivities)),
+        'sensitivity_std': float(np.std(sensitivities)),
+        'specificity_mean': float(np.mean(specificities)),
+        'specificity_std': float(np.std(specificities)),
+        'brier_mean': float(np.mean(briers)) if briers else np.nan,
+        'brier_std': float(np.std(briers)) if briers else np.nan
+    }
+    
+    return aggregated
+
+
+def save_results(
+    fold_results: List[Dict],
+    aggregated: Dict,
+    output_path: Path,
+    mcmc_config: Dict
+) -> None:
+    """Save results to JSON file."""
+    
+    results = {
+        'timestamp': datetime.now().isoformat(),
+        'model': 'bayesian_state_space',
+        'model_version': 'v3',
+        'phase': 'Phase 5: Rolling-Origin CV Evaluation',
+        'mcmc_config': mcmc_config,
+        'aggregated': aggregated,
+        'fold_results': fold_results,
+        'comparison': {
+            'v1.1_xgboost_auc': V1_1_XGBOOST_AUC,
+            'bayesian_auc': aggregated.get('auc_mean', np.nan),
+            'delta': aggregated.get('auc_mean', np.nan) - V1_1_XGBOOST_AUC
+                     if not np.isnan(aggregated.get('auc_mean', np.nan)) else np.nan
+        }
+    }
+    
+    # Handle NaN values for JSON serialization
+    def clean_for_json(obj):
+        if isinstance(obj, dict):
+            return {k: clean_for_json(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [clean_for_json(v) for v in obj]
+        elif isinstance(obj, float) and np.isnan(obj):
+            return None
+        elif isinstance(obj, (np.integer, np.floating)):
+            return float(obj)
+        return obj
+    
+    results = clean_for_json(results)
+    
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(results, f, indent=2)
+    
+    print(f"\nResults saved to: {output_path}")
+
+
+def print_comparison_table(aggregated: Dict) -> None:
+    """Print comparison table against v1.1 baselines."""
+    
+    print("\n" + "=" * 70)
+    print("COMPARISON: BAYESIAN vs v1.1 BASELINES")
+    print("=" * 70)
+    
+    print(f"\n{'Model':<25} {'AUC':>10} {'F1':>10} {'Sens':>10} {'Spec':>10} {'Brier':>10}")
+    print("-" * 70)
+    
+    # v1.1 XGBoost (from baseline_comparison.json)
+    print(f"{'XGBoost (v1.1)':<25} {'0.759':>10} {'0.440':>10} {'0.467':>10} {'0.759':>10} {'0.223':>10}")
+    
+    # Bayesian
+    auc = aggregated.get('auc_mean', np.nan)
+    f1 = aggregated.get('f1_mean', np.nan)
+    sens = aggregated.get('sensitivity_mean', np.nan)
+    spec = aggregated.get('specificity_mean', np.nan)
+    brier = aggregated.get('brier_mean', np.nan)
+    
+    auc_str = f"{auc:.3f}" if not np.isnan(auc) else "N/A"
+    f1_str = f"{f1:.3f}" if not np.isnan(f1) else "N/A"
+    sens_str = f"{sens:.3f}" if not np.isnan(sens) else "N/A"
+    spec_str = f"{spec:.3f}" if not np.isnan(spec) else "N/A"
+    brier_str = f"{brier:.3f}" if not np.isnan(brier) else "N/A"
+    
+    print(f"{'Bayesian (v3)':<25} {auc_str:>10} {f1_str:>10} {sens_str:>10} {spec_str:>10} {brier_str:>10}")
+    
+    print("-" * 70)
+    
+    if not np.isnan(auc):
+        delta = auc - V1_1_XGBOOST_AUC
+        if delta > 0:
+            print(f"\n✓ Bayesian AUC is {delta:.3f} HIGHER than XGBoost")
+        elif delta < 0:
+            print(f"\n✗ Bayesian AUC is {abs(delta):.3f} LOWER than XGBoost")
+        else:
+            print(f"\n= Bayesian AUC matches XGBoost")
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Phase 5: Evaluate Bayesian model with rolling-origin CV"
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="config/config_default.yaml",
+        help="Path to config file"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="results/metrics/bayesian_cv_results.json",
+        help="Output path for results JSON"
+    )
+    parser.add_argument(
+        "--folds",
+        type=str,
+        nargs="*",
+        default=None,
+        help="Specific folds to run (e.g., fold_2019 fold_2020). Default: all folds"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print configuration without running evaluation"
+    )
+    args = parser.parse_args()
+    
+    # Setup
+    v6_root = get_project_root()
+    config_path = v6_root / args.config
+    cfg = load_config(str(config_path))
+
+    cfg_outbreak = cfg.get('labels', {}).get('outbreak_percentile')
+    if cfg_outbreak is None:
+        raise ValueError("Missing labels.outbreak_percentile in config.")
+    outbreak_percentile = int(cfg_outbreak)
+
+    cfg_prob_threshold = cfg.get('evaluation', {}).get('probability_threshold')
+    if cfg_prob_threshold is None:
+        raise ValueError("Missing evaluation.probability_threshold in config.")
+    probability_threshold = float(cfg_prob_threshold)
+    
+    print("=" * 70)
+    print("CHIKUNGUNYA EWS - PHASE 5: BAYESIAN CV EVALUATION")
+    print("=" * 70)
+    print(f"\nModel: v3 Bayesian hierarchical state-space")
+    print(f"Stan model: {get_stan_model_path()}")
+    print(f"\nMCMC Configuration:")
+    print(f"  Chains: {MCMC_CONFIG['n_chains']}")
+    print(f"  Warmup: {MCMC_CONFIG['n_warmup']}")
+    print(f"  Samples: {MCMC_CONFIG['n_samples']}")
+    print(f"  adapt_delta: {MCMC_CONFIG['adapt_delta']}")
+    
+    # Load features
+    features_path = v6_root / cfg['data']['processed']['features']
+    print(f"\nLoading features from: {features_path}")
+    df = pd.read_parquet(features_path)
+    print(f"  → {len(df)} rows, {len(df.columns)} columns")
+    
+    # Get feature columns
+    feature_cols = get_feature_columns(df)
+    print(f"  → {len(feature_cols)} features")
+    
+    # Prepare valid data for Bayesian model
+    valid_df = prepare_valid_data(df)
+    print(f"  → {len(valid_df)} valid samples for Bayesian model")
+    
+    # Create CV splits (same as v1.1)
+    test_years = cfg['cv']['test_years']
+    folds = create_rolling_origin_splits(valid_df, test_years=test_years)
+    
+    print(f"\nCV Folds ({len(folds)} total):")
+    for fold in folds:
+        print(f"  {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}, test_year={fold.test_year}")
+    
+    # Filter to requested folds
+    if args.folds:
+        fold_names = set(args.folds)
+        folds = [f for f in folds if f.fold_name in fold_names]
+        print(f"\nFiltered to {len(folds)} requested folds: {args.folds}")
+    
+    # Estimate runtime
+    n_folds = len(folds)
+    est_minutes_per_fold = 8
+    est_total = n_folds * est_minutes_per_fold
+    print(f"\nEstimated runtime: ~{est_minutes_per_fold} min/fold × {n_folds} folds = ~{est_total} minutes")
+    
+    if args.dry_run:
+        print("\n[DRY RUN] Configuration printed. Exiting without evaluation.")
+        return
+    
+    # Run evaluation
+    print("\n" + "=" * 70)
+    print("STARTING CV EVALUATION")
+    print("=" * 70)
+    
+    fold_results = []
+    
+    for i, fold in enumerate(folds):
+        print(f"\n[{i+1}/{len(folds)}] Processing {fold.fold_name}...")
+        
+        result = evaluate_single_fold(
+            fold=fold,
+            valid_df=valid_df,
+            feature_cols=feature_cols,
+            target_col='label_outbreak',
+            mcmc_config=MCMC_CONFIG,
+            outbreak_percentile=outbreak_percentile,
+            probability_threshold=probability_threshold
+        )
+        
+        fold_results.append(result)
+    
+    # Aggregate results
+    print("\n" + "=" * 70)
+    print("AGGREGATING RESULTS")
+    print("=" * 70)
+    
+    aggregated = aggregate_results(fold_results)
+    
+    print(f"\nSuccessful folds: {aggregated['n_folds']}")
+    print(f"Failed folds: {aggregated.get('n_failed', 0)}")
+    
+    if aggregated['n_folds'] > 0:
+        print(f"\nAggregated Metrics:")
+        print(f"  AUC: {aggregated['auc_mean']:.3f} ± {aggregated['auc_std']:.3f}")
+        print(f"  F1: {aggregated['f1_mean']:.3f} ± {aggregated['f1_std']:.3f}")
+        print(f"  Sensitivity: {aggregated['sensitivity_mean']:.3f} ± {aggregated['sensitivity_std']:.3f}")
+        print(f"  Specificity: {aggregated['specificity_mean']:.3f} ± {aggregated['specificity_std']:.3f}")
+        print(f"  Brier: {aggregated['brier_mean']:.3f} ± {aggregated['brier_std']:.3f}")
+    
+    # Save results
+    output_path = v6_root / args.output
+    save_results(fold_results, aggregated, output_path, MCMC_CONFIG)
+    
+    # Print comparison
+    print_comparison_table(aggregated)
+    
+    print("\n" + "=" * 70)
+    print("PHASE 5 EVALUATION COMPLETE")
+    print("=" * 70)
+    print(f"\nResults saved to: {output_path}")
+    print("\nNext steps:")
+    print("  1. Review results and diagnostics")
+    print("  2. Compare against v1.1 baselines")
+    print("  3. If acceptable, freeze as v4")
+
+
+if __name__ == "__main__":
+    main()

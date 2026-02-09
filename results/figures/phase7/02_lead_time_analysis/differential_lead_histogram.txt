@@ -1,0 +1,11 @@
+FIGURE: Differential Lead Time (ΔL) Distribution
+============================================================
+
+WHAT IS SHOWN:
+Histogram of ΔL = L_XGB - L_Bayes for episodes where both models triggered. Positive ΔL means Bayesian warned earlier.
+
+WHY IT MATTERS:
+If ΔL > 0: Bayesian provided more advance warning. If ΔL < 0: XGBoost provided more advance warning. If ΔL = 0: Both models warned at the same time.
+
+CAVEATS:
+Only includes episodes where BOTH models warned. Episodes where one or both never warned are excluded.
