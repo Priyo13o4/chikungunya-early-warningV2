@@ -1,262 +1,258 @@
 state,district,year,n_rows,n_weeks_unique,week_min,week_max,week_coverage_proxy
-Karnataka,Tumkur,2017,10,8,5,37,0.2424
-Karnataka,Tumkur,2019,8,7,5,50,0.1522
-Karnataka,Tumkur,2013,8,6,5,30,0.2308
+Karnataka,Tumkur,2017,8,8,5,37,0.2424
 Karnataka,Tumkur,2015,8,8,19,42,0.3333
 Telangana,Mahabubnagar,2012,7,7,21,36,0.4375
-Maharashtra,Nashik,2011,6,6,20,50,0.1935
-Tamil Nadu,Madurai,2019,6,6,13,46,0.1765
+Karnataka,Tumkur,2019,7,7,5,50,0.1522
 Tamil Nadu,Madurai,2018,6,6,10,31,0.2727
 Madhya Pradesh,Sehore,2014,6,6,23,49,0.2222
-Tamil Nadu,Salem,2009,5,5,26,37,0.4167
-Karnataka,Dharwad,2019,5,5,14,43,0.1667
-Maharashtra,Pune,2021,5,5,20,35,0.3125
-Tamil Nadu,Ramanathapuram,2018,5,5,14,27,0.3571
-Maharashtra,Satara,2021,5,5,5,50,0.1087
-Maharashtra,Satara,2018,5,4,23,50,0.1429
-Maharashtra,Satara,2017,5,5,24,47,0.2083
-Jharkhand,East Singhbhum,2011,5,5,28,34,0.7143
+Tamil Nadu,Madurai,2019,6,6,13,46,0.1765
+Maharashtra,Nashik,2011,6,6,20,50,0.1935
+Karnataka,Tumkur,2013,6,6,5,30,0.2308
 Maharashtra,Beed,2012,5,5,18,44,0.1852
-Karnataka,Kalaburagi,2018,5,5,1,49,0.102
-Maharashtra,Sangli,2017,5,3,47,52,0.5
-Maharashtra,Nashik,2018,5,5,20,47,0.1786
-Karnataka,Tumkur,2016,5,5,24,39,0.3125
-Tamil Nadu,Dindigul,2012,5,5,1,23,0.2174
+Tamil Nadu,Ramanathapuram,2018,5,5,14,27,0.3571
 Tamil Nadu,Dindigul,2018,5,5,9,17,0.5556
-Madhya Pradesh,Bhind,2010,5,4,48,51,1.0
-Madhya Pradesh,Khargone,2017,4,4,35,46,0.3333
-Karnataka,Dharwad,2014,4,3,40,50,0.2727
-Karnataka,Tumkur,2014,4,3,20,30,0.2727
-Karnataka,Bidar,2011,4,4,11,34,0.1667
-Maharashtra,Ahmednagar,2016,4,3,31,41,0.2727
-Karnataka,Bijapur,2018,4,4,16,32,0.2353
+Jharkhand,East Singhbhum,2011,5,5,28,34,0.7143
+Karnataka,Tumkur,2016,5,5,24,39,0.3125
+Maharashtra,Satara,2021,5,5,5,50,0.1087
+Maharashtra,Satara,2017,5,5,24,47,0.2083
+Tamil Nadu,Dindigul,2012,5,5,1,23,0.2174
+Maharashtra,Nashik,2018,5,5,20,47,0.1786
+Karnataka,Dharwad,2019,5,5,14,43,0.1667
+Karnataka,Kalaburagi,2018,5,5,1,49,0.102
+Maharashtra,Pune,2021,5,5,20,35,0.3125
+Tamil Nadu,Salem,2009,5,5,26,37,0.4167
 Telangana,Mahabubnagar,2013,4,4,3,18,0.25
-Karnataka,Chikkaballapur,2019,4,2,42,43,1.0
-Tamil Nadu,Sivaganga,2018,4,3,12,37,0.1154
-West Bengal,Howrah,2009,4,4,45,48,1.0
+Madhya Pradesh,Khargone,2017,4,4,35,46,0.3333
+Karnataka,Bijapur,2018,4,4,16,32,0.2353
 Karnataka,Gadag,2016,4,4,6,48,0.093
-Karnataka,Kolar,2015,3,3,34,45,0.25
-Maharashtra,Nashik,2020,3,3,48,52,0.6
-Tamil Nadu,Tiruchirappalli,2014,3,3,5,27,0.1304
-Karnataka,Kalaburagi,2019,3,3,37,43,0.4286
-Tamil Nadu,Vellore,2015,3,3,19,28,0.3
-Tamil Nadu,Vellore,2013,3,3,14,31,0.1667
-Tamil Nadu,Dindigul,2013,3,2,6,8,0.6667
-West Bengal,Jalpaiguri,2012,3,3,20,28,0.3333
-Arunachal Pradesh,East Siang,2019,3,3,31,33,1.0
-Tamil Nadu,Virudhunagar,2009,3,3,25,50,0.1154
-Tamil Nadu,Salem,2011,3,3,28,49,0.1364
-Tamil Nadu,Tirunelveli,2013,3,3,3,7,0.6
-Tamil Nadu,Tiruchirapalli,2012,3,3,16,39,0.125
+West Bengal,Howrah,2009,4,4,45,48,1.0
+Maharashtra,Satara,2018,4,4,23,50,0.1429
+Madhya Pradesh,Bhind,2010,4,4,48,51,1.0
+Karnataka,Bidar,2011,4,4,11,34,0.1667
 Tamil Nadu,Karur,2009,3,3,32,45,0.2143
-West Bengal,Nadia,2010,3,3,38,41,0.75
-Tamil Nadu,Tiruvannamalai,2013,3,3,32,42,0.2727
-Tamil Nadu,Karur,2013,3,2,7,8,1.0
-Madhya Pradesh,Khandwa,2017,3,3,33,37,0.6
-Madhya Pradesh,Khargone,2011,3,3,19,51,0.0909
-Karnataka,Vijayapur,2016,3,2,14,45,0.0625
-Karnataka,Haveri,2018,3,3,23,28,0.5
-Gujarat,Panchmahal,2012,3,3,18,39,0.1364
+Tamil Nadu,Vellore,2013,3,3,14,31,0.1667
+Tamil Nadu,Vellore,2015,3,3,19,28,0.3
 Karnataka,Yadgiri,2019,3,3,11,42,0.0938
-Maharashtra,Ahmednagar,2021,3,2,16,27,0.1667
-Maharashtra,Ahmednagar,2020,3,2,46,52,0.2857
-Tamil Nadu,Perambalur,2009,3,3,44,50,0.4286
-Tamil Nadu,Namakkal,2009,3,3,25,38,0.2143
-Karnataka,Dharwad,2018,3,3,3,25,0.1304
-Jharkhand,West Singhbhum,2011,3,3,31,33,1.0
-Tamil Nadu,Theni,2009,3,3,28,50,0.1304
-Karnataka,Bagalkot,2018,3,3,12,42,0.0968
-Maharashtra,Ahmednagar,2011,3,1,45,45,1.0
 Karnataka,Hassan,2017,3,3,15,29,0.2
-Maharashtra,Kolhapur,2020,3,3,3,45,0.0698
-Tamil Nadu,Ramanathapuram,2019,3,3,6,12,0.4286
+Karnataka,Kalaburagi,2019,3,3,37,43,0.4286
+Tamil Nadu,Theni,2009,3,3,28,50,0.1304
+Tamil Nadu,Tiruvannamalai,2013,3,3,32,42,0.2727
+Karnataka,Dharwad,2014,3,3,40,50,0.2727
+Tamil Nadu,Namakkal,2009,3,3,25,38,0.2143
+Tamil Nadu,Tirunelveli,2013,3,3,3,7,0.6
 Karnataka,Davangere,2018,3,3,1,12,0.25
-Maharashtra,Pune,2016,3,1,23,23,1.0
-Tamil Nadu,Ramanathapuram,2009,2,2,38,40,0.6667
-Karnataka,Tumkur,2020,2,2,34,48,0.1333
-Karnataka,Mysore,2014,2,2,26,30,0.4
-Karnataka,Raichur,2013,2,1,43,43,1.0
+Tamil Nadu,Tiruchirappalli,2014,3,3,5,27,0.1304
+Karnataka,Kolar,2015,3,3,34,45,0.25
+Tamil Nadu,Salem,2011,3,3,28,49,0.1364
+Karnataka,Tumkur,2014,3,3,20,30,0.2727
+Tamil Nadu,Sivaganga,2018,3,3,12,37,0.1154
+Tamil Nadu,Perambalur,2009,3,3,44,50,0.4286
+Tamil Nadu,Tiruchirapalli,2012,3,3,16,39,0.125
+Karnataka,Dharwad,2018,3,3,3,25,0.1304
+Tamil Nadu,Ramanathapuram,2019,3,3,6,12,0.4286
+Tamil Nadu,Virudhunagar,2009,3,3,25,50,0.1154
+Karnataka,Haveri,2018,3,3,23,28,0.5
+Karnataka,Bagalkot,2018,3,3,12,42,0.0968
+Arunachal Pradesh,East Siang,2019,3,3,31,33,1.0
+Maharashtra,Kolhapur,2020,3,3,3,45,0.0698
+Maharashtra,Sangli,2017,3,3,47,52,0.5
+Gujarat,Panchmahal,2012,3,3,18,39,0.1364
+Jharkhand,West Singhbhum,2011,3,3,31,33,1.0
+West Bengal,Jalpaiguri,2012,3,3,20,28,0.3333
+Maharashtra,Ahmednagar,2016,3,3,31,41,0.2727
+Madhya Pradesh,Khargone,2011,3,3,19,51,0.0909
+Madhya Pradesh,Khandwa,2017,3,3,33,37,0.6
+Maharashtra,Nashik,2020,3,3,48,52,0.6
+West Bengal,Nadia,2010,3,3,38,41,0.75
 Tamil Nadu,Ramanathapuram,2010,2,2,3,40,0.0526
-Karnataka,Ramanagara,2017,2,2,27,30,0.5
-Karnataka,Shimoga,2015,2,2,17,26,0.2
-Maharashtra,Beed,2014,2,2,11,14,0.5
-Tamil Nadu,Dindigul,2009,2,2,39,49,0.1818
-Karnataka,Vijayapura,2022,2,2,22,24,0.6667
-Maharashtra,Beed,2020,2,1,53,53,1.0
-Maharashtra,Pune,2017,2,1,39,39,1.0
-Maharashtra,Osmanabad,2021,2,2,39,40,1.0
-Maharashtra,Sangli,2014,2,2,24,30,0.2857
-Maharashtra,Osmanabad,2011,2,2,40,41,1.0
-Maharashtra,Nashik,2021,2,1,20,20,1.0
-Maharashtra,Nashik,2016,2,2,50,52,0.6667
 Maharashtra,Satara,2015,2,2,49,50,1.0
+Maharashtra,Osmanabad,2021,2,2,39,40,1.0
+Tamil Nadu,Ramanathapuram,2009,2,2,38,40,0.6667
 Maharashtra,Satara,2016,2,2,16,50,0.0571
-Maharashtra,Satara,2020,2,2,48,49,1.0
-Maharashtra,Kolhapur,2021,2,2,31,50,0.1
+Karnataka,Ramanagara,2017,2,2,27,30,0.5
+Tamil Nadu,Dindigul,2013,2,2,6,8,0.6667
+Maharashtra,Sangli,2014,2,2,24,30,0.2857
 Maharashtra,Kolhapur,2019,2,2,48,51,0.5
-Maharashtra,Satara,2022,2,2,22,23,1.0
-Maharashtra,Thane,2021,2,2,6,32,0.0741
-Odisha,Ganjam,2012,2,2,16,22,0.2857
-Odisha,Jajpur,2019,2,2,48,49,1.0
-Kerala,Kannur,2010,2,2,22,24,0.6667
-Maharashtra,Beed,2011,2,2,39,45,0.2857
-Rajasthan,Alwar,2016,2,2,35,36,1.0
-Rajasthan,Bikaner,2010,2,2,50,51,1.0
-Maharashtra,Ahmednagar,2015,2,2,8,9,1.0
-Maharashtra,Ahmednagar,2014,2,2,18,23,0.3333
-Madhya Pradesh,Tikamgarh,2011,2,2,43,51,0.2222
-Madhya Pradesh,Sehore,2017,2,1,43,43,1.0
-Madhya Pradesh,Morena,2010,2,1,48,48,1.0
-Tamil Nadu,Coimbatore,2011,2,2,37,45,0.2222
-Madhya Pradesh,Khandwa,2011,2,2,43,45,0.6667
-Madhya Pradesh,Betul,2011,2,2,27,30,0.5
-Tamil Nadu,Erode,2019,2,2,8,10,0.6667
-Tamil Nadu,Kanyakumari,2012,2,1,19,19,1.0
-Kerala,Kozhikode,2009,2,2,31,33,0.6667
+Karnataka,Mysore,2014,2,2,26,30,0.4
+Maharashtra,Kolhapur,2021,2,2,31,50,0.1
+Karnataka,Shimoga,2015,2,2,17,26,0.2
+Maharashtra,Nashik,2016,2,2,50,52,0.6667
 Tamil Nadu,Salem,2012,2,2,31,33,0.6667
-Tamil Nadu,Ramanathapuram,2014,2,2,9,10,1.0
 Maharashtra,Pune,2018,2,2,27,40,0.1429
-Gujarat,Jamnagar,2012,2,2,18,24,0.2857
-Karnataka,Dharwad,2015,2,2,1,35,0.0571
-Tamil Nadu,Thiruvannamalai,2014,2,2,32,39,0.25
-Tamil Nadu,Thoothukudi,2012,2,2,10,16,0.2857
-Gujarat,Kheda,2012,2,1,18,18,1.0
-Gujarat,Kutch,2010,2,2,33,34,1.0
-Gujarat,Mahesana,2016,2,2,43,44,1.0
-Tamil Nadu,Tiruchirapalli,2018,2,2,8,22,0.1333
-Karnataka,Chikkaballapura,2017,2,2,31,41,0.1818
-Tamil Nadu,Tiruvannamalai,2010,2,2,39,43,0.4
-Telangana,Mahabubnagar,2019,2,2,14,27,0.1429
-Tamil Nadu,Trichy,2009,2,2,50,52,0.6667
-Gujarat,Vadodara,2011,2,2,41,42,1.0
-Karnataka,Belgaum,2011,2,2,22,44,0.087
-Karnataka,Belgaum,2010,2,2,16,40,0.08
-Telangana,Karimnagar,2018,2,2,30,32,0.6667
-Tamil Nadu,Virudhunagar,2013,2,2,10,35,0.0769
-Tamil Nadu,Virudhunagar,2014,2,2,27,39,0.1538
-Karnataka,Ballari,2014,2,2,38,40,0.6667
-Karnataka,Bagalkot,2019,2,2,2,49,0.0417
+Maharashtra,Osmanabad,2011,2,2,40,41,1.0
+Maharashtra,Satara,2020,2,2,48,49,1.0
+Odisha,Ganjam,2012,2,2,16,22,0.2857
+Maharashtra,Satara,2022,2,2,22,23,1.0
+Madhya Pradesh,Tikamgarh,2011,2,2,43,51,0.2222
+Madhya Pradesh,Betul,2011,2,2,27,30,0.5
+Madhya Pradesh,Khandwa,2011,2,2,43,45,0.6667
+Tamil Nadu,Erode,2019,2,2,8,10,0.6667
+Tamil Nadu,Coimbatore,2011,2,2,37,45,0.2222
+Tamil Nadu,Karur,2013,2,2,7,8,1.0
+Kerala,Kozhikode,2009,2,2,31,33,0.6667
+Kerala,Kannur,2010,2,2,22,24,0.6667
+Rajasthan,Bikaner,2010,2,2,50,51,1.0
+Karnataka,Vijayapura,2022,2,2,22,24,0.6667
+Rajasthan,Alwar,2016,2,2,35,36,1.0
+Maharashtra,Thane,2021,2,2,6,32,0.0741
+Maharashtra,Ahmednagar,2014,2,2,18,23,0.3333
+Karnataka,Vijayapur,2016,2,2,14,45,0.0625
+Maharashtra,Ahmednagar,2015,2,2,8,9,1.0
+Karnataka,Tumkur,2020,2,2,34,48,0.1333
+Maharashtra,Ahmednagar,2020,2,2,46,52,0.2857
+Maharashtra,Ahmednagar,2021,2,2,16,27,0.1667
+Odisha,Jajpur,2019,2,2,48,49,1.0
+Tamil Nadu,Dindigul,2009,2,2,39,49,0.1818
+Maharashtra,Beed,2011,2,2,39,45,0.2857
+Maharashtra,Beed,2014,2,2,11,14,0.5
+Tamil Nadu,Ramanathapuram,2014,2,2,9,10,1.0
+West Bengal,Hooghly,2011,2,2,41,42,1.0
 Gujarat,Junagadh,2017,2,2,15,22,0.25
-Tamil Nadu,Tiruchirappalli,2013,2,2,13,14,1.0
+Tamil Nadu,Tiruvannamalai,2010,2,2,39,43,0.4
+Tamil Nadu,Thoothukudi,2012,2,2,10,16,0.2857
+Karnataka,Ballari,2014,2,2,38,40,0.6667
+Tamil Nadu,Virudhunagar,2013,2,2,10,35,0.0769
+Gujarat,Amreli,2011,2,2,15,17,0.6667
+Gujarat,Jamnagar,2012,2,2,18,24,0.2857
+Karnataka,Belgaum,2011,2,2,22,44,0.087
+Tamil Nadu,Thiruvannamalai,2014,2,2,32,39,0.25
+Gujarat,Mahesana,2016,2,2,43,44,1.0
+Gujarat,Vadodara,2011,2,2,41,42,1.0
+Karnataka,Belgaum,2010,2,2,16,40,0.08
+Karnataka,Chikkaballapura,2017,2,2,31,41,0.1818
+Tamil Nadu,Tiruchirapalli,2018,2,2,8,22,0.1333
+Karnataka,Chikkaballapur,2019,2,2,42,43,1.0
+Gujarat,Kutch,2010,2,2,33,34,1.0
+Telangana,Karimnagar,2018,2,2,30,32,0.6667
+Goa,South Goa,2009,2,2,30,52,0.087
 West Bengal,Jalpaiguri,2015,2,2,44,45,1.0
-Tamil Nadu,Theni,2019,2,2,32,38,0.2857
 Tamil Nadu,Thanjavur,2014,2,2,39,44,0.3333
+Karnataka,Bagalkot,2019,2,2,2,49,0.0417
+Telangana,Mahabubnagar,2019,2,2,14,27,0.1429
+Tamil Nadu,Virudhunagar,2014,2,2,27,39,0.1538
+Tamil Nadu,Trichy,2009,2,2,50,52,0.6667
+Karnataka,Gadag,2015,2,2,27,34,0.25
 Assam,Kamrup,2016,2,2,40,44,0.4
 West Bengal,Jalpaiguri,2011,2,2,47,50,0.5
-Karnataka,Gadag,2015,2,2,27,34,0.25
-Goa,South Goa,2009,2,2,30,52,0.087
-Karnataka,Kalaburgi,2019,2,1,47,47,1.0
-West Bengal,Hooghly,2011,2,2,41,42,1.0
-Gujarat,Amreli,2011,2,2,15,17,0.6667
-Maharashtra,Raigad,2016,1,1,22,22,1.0
+Tamil Nadu,Theni,2019,2,2,32,38,0.2857
+Karnataka,Dharwad,2015,2,2,1,35,0.0571
+Tamil Nadu,Tiruchirappalli,2013,2,2,13,14,1.0
 Telangana,Mahabubnagar,2014,1,1,25,25,1.0
-Puducherry,Puducherry,2018,1,1,50,50,1.0
-Puducherry,Puducherry,2019,1,1,14,14,1.0
-Tamil Nadu,Virudhunagar- Sivakasi,2018,1,1,33,33,1.0
-Rajasthan,Barmer,2011,1,1,19,19,1.0
-Telangana,Mahabubnagar,2011,1,1,4,4,1.0
-Maharashtra,Ratnagiri,2012,1,1,44,44,1.0
-Rajasthan,Ganganagar,2016,1,1,43,43,1.0
-Telangana,Mahaboobnagar,2017,1,1,52,52,1.0
-Telangana,Mahaboobnagar,2016,1,1,40,40,1.0
-West Bengal,Nadia,2012,1,1,37,37,1.0
-Maharashtra,Ratnagiri,2009,1,1,50,50,1.0
-Rajasthan,Jaipur,2010,1,1,16,16,1.0
-Telangana,Khammam,2018,1,1,30,30,1.0
-Puducherry,Puducherry,2010,1,1,3,3,1.0
-Telangana,Jogulamba Gadwal,2018,1,1,16,16,1.0
-Rajasthan,Nagaur,2015,1,1,47,47,1.0
-West Bengal,Malda,2009,1,1,46,46,1.0
-West Bengal,North 24 Parganas,2010,1,1,48,48,1.0
 Telangana,Mahabubnagar,2015,1,1,13,13,1.0
-Maharashtra,Sangli,2019,1,1,24,24,1.0
-Maharashtra,Sangli,2012,1,1,21,21,1.0
+Puducherry,Pondicherry,2018,1,1,39,39,1.0
+Puducherry,Puducherry,2018,1,1,50,50,1.0
+Odisha,Puri,2009,1,1,39,39,1.0
+Puducherry,Puducherry,2010,1,1,3,3,1.0
+Tamil Nadu,Tenkasi (Tirunelveli),2020,1,1,23,23,1.0
+Telangana,Mahabubnagar,2011,1,1,4,4,1.0
+Telangana,Mahaboobnagar,2017,1,1,52,52,1.0
+Puducherry,Puducherry,2019,1,1,14,14,1.0
+Telangana,Mahaboobnagar,2016,1,1,40,40,1.0
+Telangana,Mahbubnagar,2013,1,1,46,46,1.0
+Telangana,Khammam,2018,1,1,30,30,1.0
+Rajasthan,Barmer,2011,1,1,19,19,1.0
+Telangana,Jogulamba Gadwal,2018,1,1,16,16,1.0
+Rajasthan,Ganganagar,2016,1,1,43,43,1.0
+Rajasthan,Jaipur,2010,1,1,16,16,1.0
+Rajasthan,Nagaur,2015,1,1,47,47,1.0
+Tamil Nadu,Virudhunagar- Sivakasi,2018,1,1,33,33,1.0
+Odisha,Ganjam,2015,1,1,39,39,1.0
+Maharashtra,Thane,2010,1,1,11,11,1.0
+Telangana,Medak,2013,1,1,51,51,1.0
 Telangana,Medak,2015,1,1,45,45,1.0
+Maharashtra,Pune,2016,1,1,23,23,1.0
+Maharashtra,Pune,2017,1,1,39,39,1.0
+West Bengal,North 24 Parganas,2010,1,1,48,48,1.0
+West Bengal,Nadia,2012,1,1,37,37,1.0
+Maharashtra,Pune,2020,1,1,48,48,1.0
+West Bengal,Malda,2009,1,1,46,46,1.0
+Maharashtra,Raigad,2016,1,1,22,22,1.0
+Maharashtra,Ratnagiri,2009,1,1,50,50,1.0
+Maharashtra,Ratnagiri,2012,1,1,44,44,1.0
+Maharashtra,Sangli,2012,1,1,21,21,1.0
+West Bengal,Howrah,2011,1,1,43,43,1.0
+Maharashtra,Sangli,2015,1,1,15,15,1.0
+Maharashtra,Sangli,2019,1,1,24,24,1.0
+West Bengal,Burdwan,2011,1,1,42,42,1.0
 West Bengal,Burdwan,2010,1,1,52,52,1.0
 West Bengal,Bardhaman,2011,1,1,40,40,1.0
-West Bengal,Howrah,2011,1,1,43,43,1.0
 Uttar Pradesh,Budaun,2016,1,1,39,39,1.0
-Maharashtra,Sangli,2015,1,1,15,15,1.0
 Telangana,Nizamabad,2013,1,1,28,28,1.0
+Tamil Nadu,Ariyalur (Perambalur),2009,1,1,26,26,1.0
 Telangana,Nalgonda,2014,1,1,7,7,1.0
-Maharashtra,Thane,2010,1,1,11,11,1.0
-Tamil Nadu,Virudhunagar,2018,1,1,27,27,1.0
 Maharashtra,Wardha,2011,1,1,31,31,1.0
-Puducherry,Pondicherry,2018,1,1,39,39,1.0
 Maharashtra,Washim,2011,1,1,51,51,1.0
 Maharashtra,Washim,2016,1,1,36,36,1.0
 Meghalaya,West Garo Hills,2017,1,1,33,33,1.0
 Odisha,Bolangir,2021,1,1,5,5,1.0
-Telangana,Medak,2013,1,1,51,51,1.0
-Odisha,Ganjam,2015,1,1,39,39,1.0
-Telangana,Mahbubnagar,2013,1,1,46,46,1.0
-West Bengal,Burdwan,2011,1,1,42,42,1.0
-Odisha,Puri,2009,1,1,39,39,1.0
-Tamil Nadu,Virudhunagar Sivakasi,2019,1,1,46,46,1.0
-Tamil Nadu,Salem,2017,1,1,49,49,1.0
 Tamil Nadu,Ariyalur,2019,1,1,8,8,1.0
-Tamil Nadu,Ariyalur (Perambalur),2009,1,1,26,26,1.0
-Tamil Nadu,Namakkal,2013,1,1,42,42,1.0
+Tamil Nadu,Dharmapuri,2012,1,1,16,16,1.0
+Tamil Nadu,Coimbatore,2009,1,1,50,50,1.0
+Tamil Nadu,Tirunelveli,2020,1,1,24,24,1.0
+Tamil Nadu,Tiruchirappalli,2012,1,1,15,15,1.0
 Tamil Nadu,Tiruchirappalli,2009,1,1,40,40,1.0
 Tamil Nadu,Perambalur,2012,1,1,20,20,1.0
 Tamil Nadu,Perambalur,2015,1,1,4,4,1.0
-Tamil Nadu,Tiruchirapalli,2015,1,1,5,5,1.0
-Tamil Nadu,Thoothukudi,2017,1,1,32,32,1.0
-Tamil Nadu,Thiruvannamalai,2015,1,1,41,41,1.0
-Tamil Nadu,Thiruvallur,2011,1,1,36,36,1.0
 Tamil Nadu,Perambalur,2017,1,1,46,46,1.0
 Tamil Nadu,Pudukkottai,2009,1,1,47,47,1.0
 Tamil Nadu,Pudukkottai,2010,1,1,35,35,1.0
 Tamil Nadu,Pudukkottai,2014,1,1,38,38,1.0
+Tamil Nadu,Tiruchirapalli,2015,1,1,5,5,1.0
 Tamil Nadu,Pudukottai,2012,1,1,19,19,1.0
 Tamil Nadu,Pudukottai,2014,1,1,37,37,1.0
+Tamil Nadu,Thoothukudi,2017,1,1,32,32,1.0
 Tamil Nadu,Pudukottai,2019,1,1,6,6,1.0
-Tamil Nadu,Theni,2018,1,1,25,25,1.0
-Tamil Nadu,Theni,2014,1,1,25,25,1.0
+Tamil Nadu,Thiruvannamalai,2015,1,1,41,41,1.0
 Tamil Nadu,Ramanathapuram,2012,1,1,39,39,1.0
 Tamil Nadu,Ramanathapuram,2013,1,1,13,13,1.0
-Tamil Nadu,Theni,2012,1,1,33,33,1.0
 Tamil Nadu,Ramanathapuram,2015,1,1,12,12,1.0
-Tamil Nadu,Thanjavur,2012,1,1,39,39,1.0
-Tamil Nadu,Tenkasi (Tirunelveli),2020,1,1,23,23,1.0
-Tamil Nadu,Sivaganga,2015,1,1,10,10,1.0
+Tamil Nadu,Thiruvallur,2011,1,1,36,36,1.0
+Tamil Nadu,Theni,2018,1,1,25,25,1.0
 Tamil Nadu,Salem,2010,1,1,39,39,1.0
-Tamil Nadu,Salem,2019,1,1,2,2,1.0
+Tamil Nadu,Theni,2014,1,1,25,25,1.0
+Tamil Nadu,Theni,2012,1,1,33,33,1.0
+Tamil Nadu,Salem,2015,1,1,24,24,1.0
+Tamil Nadu,Salem,2017,1,1,49,49,1.0
 Tamil Nadu,Salem,2018,1,1,29,29,1.0
-Tamil Nadu,Tiruchirappalli,2012,1,1,15,15,1.0
+Tamil Nadu,Salem,2019,1,1,2,2,1.0
+Tamil Nadu,Sivaganga,2015,1,1,10,10,1.0
 Tamil Nadu,Tirunelveli,2009,1,1,35,35,1.0
-Tamil Nadu,Tirunelveli,2020,1,1,24,24,1.0
-Tamil Nadu,Vellore,2009,1,1,25,25,1.0
-Tamil Nadu,Coimbatore,2009,1,1,50,50,1.0
+Tamil Nadu,Namakkal,2013,1,1,42,42,1.0
+Tamil Nadu,Virudhunagar Sivakasi,2019,1,1,46,46,1.0
+Tamil Nadu,Tiruppur,2018,1,1,38,38,1.0
+Tamil Nadu,Virudhunagar,2018,1,1,27,27,1.0
 Tamil Nadu,Cuddalore,2011,1,1,50,50,1.0
 Tamil Nadu,Cuddalore,2012,1,1,7,7,1.0
-Tamil Nadu,Salem,2015,1,1,24,24,1.0
-Tamil Nadu,Villupuram,2019,1,1,9,9,1.0
 Tamil Nadu,Dharmapuri,2011,1,1,31,31,1.0
-Tamil Nadu,Dharmapuri,2012,1,1,16,16,1.0
+Tamil Nadu,Thanjavur,2012,1,1,39,39,1.0
 Tamil Nadu,Dharmapuri,2018,1,1,50,50,1.0
 Tamil Nadu,Dharmapuri,2019,1,1,26,26,1.0
-Tamil Nadu,Villupuram,2012,1,1,9,9,1.0
-Tamil Nadu,Vellore,2010,1,1,32,32,1.0
+Tamil Nadu,Virudhunagar,2010,1,1,7,7,1.0
 Tamil Nadu,Dindigul,2014,1,1,9,9,1.0
+Tamil Nadu,Villupuram,2019,1,1,9,9,1.0
+Tamil Nadu,Villupuram,2012,1,1,9,9,1.0
 Tamil Nadu,Erode,2011,1,1,30,30,1.0
-Tamil Nadu,Tiruppur,2018,1,1,38,38,1.0
 Tamil Nadu,Erode,2014,1,1,47,47,1.0
-Tamil Nadu,Trichy,2019,1,1,12,12,1.0
-Tamil Nadu,Trichy,2016,1,1,9,9,1.0
 Tamil Nadu,Kancheepuram,2013,1,1,3,3,1.0
 Tamil Nadu,Kancheepuram,2014,1,1,32,32,1.0
-Tamil Nadu,Tiruvarur,2013,1,1,30,30,1.0
-Tamil Nadu,Tiruvannamalai,2014,1,1,46,46,1.0
-Tamil Nadu,Tiruvannamalai,2011,1,1,50,50,1.0
+Tamil Nadu,Kanyakumari,2012,1,1,19,19,1.0
+Tamil Nadu,Vellore,2010,1,1,32,32,1.0
+Tamil Nadu,Vellore,2009,1,1,25,25,1.0
 Tamil Nadu,Karur,2019,1,1,8,8,1.0
+Tamil Nadu,Trichy,2019,1,1,12,12,1.0
+Tamil Nadu,Trichy,2016,1,1,9,9,1.0
 Tamil Nadu,Krishnagiri,2009,1,1,27,27,1.0
 Tamil Nadu,Madurai,2014,1,1,42,42,1.0
 Tamil Nadu,Madurai,2017,1,1,33,33,1.0
-Tamil Nadu,Virudhunagar,2010,1,1,7,7,1.0
+Tamil Nadu,Tiruvarur,2013,1,1,30,30,1.0
+Tamil Nadu,Tiruvannamalai,2014,1,1,46,46,1.0
+Tamil Nadu,Tiruvannamalai,2011,1,1,50,50,1.0
+Maharashtra,Parbhani,2011,1,1,35,35,1.0
 Andhra Pradesh,Chittoor,2013,1,1,11,11,1.0
-Maharashtra,Pune,2020,1,1,48,48,1.0
-Karnataka,Chamarajanagar,2021,1,1,5,5,1.0
+Maharashtra,Osmanabad,2019,1,1,39,39,1.0
+Karnataka,Bidar,2015,1,1,53,53,1.0
+Karnataka,Chitradurga,2014,1,1,22,22,1.0
+Karnataka,Chikkaballapura,2020,1,1,46,46,1.0
 Karnataka,Chikkaballapura,2019,1,1,27,27,1.0
 Karnataka,Chikkaballapura,2018,1,1,33,33,1.0
 Karnataka,Chikkaballapura,2016,1,1,34,34,1.0
@@ -265,8 +261,8 @@ Karnataka,Chikkaballapur,2014,1,1,44,44,1.0
 Karnataka,Chamrajnagar,2014,1,1,22,22,1.0
 Karnataka,Chamrajnagar,2013,1,1,49,49,1.0
 Karnataka,Chamarajnagar,2010,1,1,21,21,1.0
+Karnataka,Chamarajanagar,2021,1,1,5,5,1.0
 Karnataka,Chamarajanagar,2019,1,1,25,25,1.0
-Karnataka,Chitradurga,2014,1,1,22,22,1.0
 Karnataka,Chamarajanagar,2017,1,1,5,5,1.0
 Karnataka,Chamarajanagar,2015,1,1,39,39,1.0
 Karnataka,Chamarajanagar,2014,1,1,23,23,1.0
@@ -274,11 +270,11 @@ Karnataka,Bijapur,2017,1,1,31,31,1.0
 Karnataka,Bijapur,2014,1,1,16,16,1.0
 Karnataka,Bijapur,2011,1,1,27,27,1.0
 Karnataka,Bidar,2021,1,1,7,7,1.0
-Karnataka,Bidar,2019,1,1,40,40,1.0
-Karnataka,Chikkaballapura,2020,1,1,46,46,1.0
 Karnataka,Chitradurga,2015,1,1,22,22,1.0
-Maharashtra,Parbhani,2011,1,1,35,35,1.0
-Karnataka,Hassan,2020,1,1,18,18,1.0
+Karnataka,Dakshina Kannada,2019,1,1,47,47,1.0
+Karnataka,Davangere,2014,1,1,23,23,1.0
+Karnataka,Kalaburgi,2019,1,1,47,47,1.0
+Karnataka,Mandya,2017,1,1,2,2,1.0
 Karnataka,Mandya,2016,1,1,26,26,1.0
 Karnataka,Koppal,2014,1,1,28,28,1.0
 Karnataka,Kolar,2019,1,1,26,26,1.0
@@ -287,30 +283,30 @@ Karnataka,Kolar,2013,1,1,44,44,1.0
 Karnataka,Kodagu,2010,1,1,36,36,1.0
 Karnataka,Kalburgi,2021,1,1,34,34,1.0
 Karnataka,Kalaburgi,2018,1,1,2,2,1.0
+Karnataka,Dharwad,2016,1,1,17,17,1.0
+Karnataka,Hassan,2020,1,1,18,18,1.0
 Karnataka,Hassan,2019,1,1,11,11,1.0
-Karnataka,Dakshina Kannada,2019,1,1,47,47,1.0
 Karnataka,Hassan,2018,1,1,23,23,1.0
 Karnataka,Hassan,2016,1,1,19,19,1.0
 Karnataka,Gulbarga,2013,1,1,16,16,1.0
 Karnataka,Gadag,2018,1,1,23,23,1.0
 Karnataka,Gadag,2014,1,1,49,49,1.0
 Karnataka,Gadag,2013,1,1,13,13,1.0
-Karnataka,Dharwad,2016,1,1,17,17,1.0
-Karnataka,Davangere,2014,1,1,23,23,1.0
-Karnataka,Bidar,2015,1,1,53,53,1.0
+Karnataka,Bidar,2019,1,1,40,40,1.0
 Karnataka,Bengaluru Urban,2019,1,1,48,48,1.0
+Maharashtra,Osmanabad,2017,1,1,2,2,1.0
 Karnataka,Bengaluru,2018,1,1,32,32,1.0
-Gujarat,Devbhoomi Dwarka,2019,1,1,21,21,1.0
 Gujarat,Narmada,2012,1,1,15,15,1.0
 Gujarat,Morbi,2017,1,1,44,44,1.0
 Gujarat,Mehsana,2013,1,1,14,14,1.0
 Gujarat,Mahesana,2017,1,1,12,12,1.0
 Gujarat,Kheda,2013,1,1,14,14,1.0
+Gujarat,Kheda,2012,1,1,18,18,1.0
 Gujarat,Kheda,2011,1,1,17,17,1.0
 Gujarat,Junagarh,2017,1,1,13,13,1.0
 Gujarat,Junagadh,2018,1,1,18,18,1.0
+Gujarat,Devbhoomi Dwarka,2019,1,1,21,21,1.0
 Gujarat,Bharuch,2012,1,1,19,19,1.0
-Karnataka,Belgaum,2014,1,1,6,6,1.0
 Gujarat,Ahmadabad,2012,1,1,21,21,1.0
 Dadra and Nagar Haveli,Dadra and Nagar Haveli,2015,1,1,34,34,1.0
 Bihar,Nalanda,2011,1,1,46,46,1.0
@@ -322,7 +318,8 @@ Andhra Pradesh,Prakasam,2013,1,1,11,11,1.0
 Gujarat,Navsari,2016,1,1,42,42,1.0
 Gujarat,Panchmahal,2013,1,1,48,48,1.0
 Gujarat,Patan,2011,1,1,49,49,1.0
-Gujarat,Porbandar,2017,1,1,5,5,1.0
+Karnataka,Ballari,2011,1,1,28,28,1.0
+Karnataka,Belgaum,2014,1,1,6,6,1.0
 Karnataka,Belgaum,2013,1,1,23,23,1.0
 Karnataka,Belagavi,2019,1,1,16,16,1.0
 Karnataka,Bangalore Urban,2019,1,1,24,24,1.0
@@ -330,8 +327,8 @@ Karnataka,Bangalore Rural,2016,1,1,22,22,1.0
 Karnataka,Bangalore,2019,1,1,51,51,1.0
 Karnataka,Ballari,2015,1,1,42,42,1.0
 Karnataka,Ballari,2013,1,1,26,26,1.0
-Karnataka,Ballari,2011,1,1,28,28,1.0
 Karnataka,Bagalkot,2021,1,1,3,3,1.0
+Gujarat,Porbandar,2017,1,1,5,5,1.0
 Karnataka,Bagalkot,2016,1,1,28,28,1.0
 Jharkhand,Khunti,2019,1,1,13,13,1.0
 Jharkhand,East Singhbhum,2017,1,1,47,47,1.0
@@ -340,52 +337,54 @@ Haryana,Yamuna Nagar,2011,1,1,41,41,1.0
 Haryana,Panchkula,2011,1,1,41,41,1.0
 Gujarat,Sabarkantha,2011,1,1,40,40,1.0
 Gujarat,Sabarkantha,2010,1,1,40,40,1.0
-Karnataka,Mandya,2017,1,1,2,2,1.0
+Karnataka,Raichur,2013,1,1,43,43,1.0
 Karnataka,Raichur,2014,1,1,13,13,1.0
 Karnataka,Raichur,2015,1,1,16,16,1.0
-Maharashtra,Akola,2022,1,1,11,11,1.0
-Maharashtra,Dhule,2011,1,1,15,15,1.0
-Maharashtra,Beed,2021,1,1,31,31,1.0
+Karnataka,Raichur,2017,1,1,37,37,1.0
+Maharashtra,Beed,2020,1,1,53,53,1.0
 Maharashtra,Beed,2017,1,1,46,46,1.0
 Maharashtra,Beed,2016,1,1,38,38,1.0
 Andhra Pradesh,Kadapa,2017,1,1,11,11,1.0
 Maharashtra,Beed,2013,1,1,42,42,1.0
 Maharashtra,Beed,2010,1,1,46,46,1.0
 Maharashtra,Aurangabad,2015,1,1,51,51,1.0
+Maharashtra,Akola,2022,1,1,11,11,1.0
 Maharashtra,Akola,2021,1,1,49,49,1.0
-Madhya Pradesh,Khargone,2013,1,1,45,45,1.0
 Maharashtra,Akola,2012,1,1,46,46,1.0
 Maharashtra,Akola,2011,1,1,43,43,1.0
 Maharashtra,Ahmednagar,2017,1,1,38,38,1.0
 Maharashtra,Ahmednagar,2012,1,1,21,21,1.0
+Maharashtra,Ahmednagar,2011,1,1,45,45,1.0
+Madhya Pradesh,Sehore,2017,1,1,43,43,1.0
 Madhya Pradesh,Satna,2010,1,1,51,51,1.0
 Madhya Pradesh,Rajgarh,2011,1,1,44,44,1.0
 Madhya Pradesh,Morena,2018,1,1,21,21,1.0
-Madhya Pradesh,Khargone,2016,1,1,45,45,1.0
+Madhya Pradesh,Morena,2010,1,1,48,48,1.0
+Maharashtra,Beed,2021,1,1,31,31,1.0
+Maharashtra,Dhule,2011,1,1,15,15,1.0
 Maharashtra,Dhule,2012,1,1,48,48,1.0
-Maharashtra,Dhule,2014,1,1,45,45,1.0
-Maharashtra,Gadchiroli,2011,1,1,40,40,1.0
-Maharashtra,Jalgaon,2011,1,1,49,49,1.0
-Maharashtra,Osmanabad,2019,1,1,39,39,1.0
-Maharashtra,Osmanabad,2017,1,1,2,2,1.0
+Maharashtra,Nagpur,2017,1,1,33,33,1.0
 Maharashtra,Osmanabad,2015,1,1,50,50,1.0
 Maharashtra,Osmanabad,2013,1,1,29,29,1.0
 Maharashtra,Nasik,2021,1,1,30,30,1.0
+Maharashtra,Nashik,2021,1,1,20,20,1.0
 Maharashtra,Nashik,2017,1,1,47,47,1.0
 Maharashtra,Nashik,2013,1,1,45,45,1.0
 Maharashtra,Nandurbar,2017,1,1,51,51,1.0
 Maharashtra,Nanded,2021,1,1,47,47,1.0
-Maharashtra,Nagpur,2017,1,1,33,33,1.0
 Maharashtra,Nagpur,2014,1,1,41,41,1.0
+Maharashtra,Dhule,2014,1,1,45,45,1.0
 Maharashtra,Latur,2016,1,1,2,2,1.0
 Maharashtra,Latur,2013,1,1,49,49,1.0
 Maharashtra,Kolhapur,2018,1,1,22,22,1.0
 Maharashtra,Jalna,2017,1,1,51,51,1.0
 Maharashtra,Jalgaon,2022,1,1,23,23,1.0
 Maharashtra,Jalgaon,2017,1,1,46,46,1.0
+Maharashtra,Jalgaon,2011,1,1,49,49,1.0
+Maharashtra,Gadchiroli,2011,1,1,40,40,1.0
+Madhya Pradesh,Khargone,2016,1,1,45,45,1.0
 Madhya Pradesh,Khargone,2014,1,1,17,17,1.0
-Madhya Pradesh,Khandwa,2014,1,1,49,49,1.0
-Karnataka,Raichur,2017,1,1,37,37,1.0
+Madhya Pradesh,Khargone,2013,1,1,45,45,1.0
 Karnataka,Shivamogga,2018,1,1,25,25,1.0
 Kerala,Ernakulam,2014,1,1,34,34,1.0
 Karnataka,Yadgiri,2017,1,1,7,7,1.0
@@ -396,7 +395,7 @@ Karnataka,Tumkur,2012,1,1,18,18,1.0
 Karnataka,Tumkur,2011,1,1,30,30,1.0
 Karnataka,Tumkur,2010,1,1,19,19,1.0
 Karnataka,Shimoga,2019,1,1,23,23,1.0
-Madhya Pradesh,Gwalior,2011,1,1,44,44,1.0
+Kerala,Kannur,2009,1,1,25,25,1.0
 Karnataka,Shimoga,2018,1,1,35,35,1.0
 Karnataka,Shimoga,2016,1,1,2,2,1.0
 Karnataka,Shimoga,2013,1,1,23,23,1.0
@@ -406,9 +405,10 @@ Karnataka,Ramanagara,2015,1,1,39,39,1.0
 Karnataka,Ramanagar,2014,1,1,23,23,1.0
 Karnataka,Raichur,2020,1,1,9,9,1.0
 Kerala,Idukki,2019,1,1,29,29,1.0
-Kerala,Kannur,2009,1,1,25,25,1.0
 Kerala,Malappuram,2009,1,1,33,33,1.0
-Kerala,Mallapuram,2009,1,1,37,37,1.0
+Madhya Pradesh,Khandwa,2014,1,1,49,49,1.0
+Madhya Pradesh,Bhind,2015,1,1,47,47,1.0
+Madhya Pradesh,Gwalior,2011,1,1,44,44,1.0
 Madhya Pradesh,Dhar,2011,1,1,44,44,1.0
 Madhya Pradesh,Dhar,2010,1,1,50,50,1.0
 Madhya Pradesh,Chhindwara,2011,1,1,47,47,1.0
@@ -416,8 +416,8 @@ Madhya Pradesh,Burhanpur,2017,1,1,42,42,1.0
 Madhya Pradesh,Burhanpur,2011,1,1,42,42,1.0
 Madhya Pradesh,Bhopal,2011,1,1,45,45,1.0
 Madhya Pradesh,Bhind,2018,1,1,48,48,1.0
-Madhya Pradesh,Bhind,2015,1,1,47,47,1.0
 Madhya Pradesh,Bhind,2011,1,1,43,43,1.0
+Kerala,Mallapuram,2009,1,1,37,37,1.0
 Madhya Pradesh,Barwani,2017,1,1,40,40,1.0
 Madhya Pradesh,Barwani,2016,1,1,45,45,1.0
 Kerala,Wayanad,2010,1,1,33,33,1.0

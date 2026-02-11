@@ -1,5 +1,5 @@
 reason,n_rows,pct_of_all_rows,pct_of_missing_labels
-labeled,101,13.82,16.03
-early_in_series(<10),618,84.54,98.1
-insufficient_valid_history(>=10),12,1.64,1.9
-other_unexpected,0,0.0,0.0
+labeled,74,10.6,11.86
+early_in_series(<10),604,86.53,96.79
+insufficient_valid_history(>=10),11,1.58,1.76
+other_unexpected,9,1.29,1.44

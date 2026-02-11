@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-08T22:25:15.743096",
+  "timestamp": "2026-02-11T00:03:09.449220",
   "phase": "Phase 7 - Workstream A",
   "version": "v4",
   "config": {
@@ -24,49 +24,42 @@
       "seed": 42
     }
   },
-  "folds_completed": 6,
-  "folds_failed": 0,
-  "total_episodes": 3,
+  "folds_completed": 5,
+  "folds_failed": 1,
+  "total_episodes": 2,
   "fold_summary": [
-    {
-      "fold": "fold_2017",
-      "test_year": 2017,
-      "n_train": 23,
-      "n_test": 68,
-      "n_episodes": 1
-    },
     {
       "fold": "fold_2018",
       "test_year": 2018,
-      "n_train": 35,
-      "n_test": 80,
+      "n_train": 26,
+      "n_test": 78,
       "n_episodes": 0
     },
     {
       "fold": "fold_2019",
       "test_year": 2019,
-      "n_train": 54,
-      "n_test": 76,
+      "n_train": 43,
+      "n_test": 72,
       "n_episodes": 1
     },
     {
       "fold": "fold_2020",
       "test_year": 2020,
-      "n_train": 75,
-      "n_test": 22,
+      "n_train": 58,
+      "n_test": 20,
       "n_episodes": 0
     },
     {
       "fold": "fold_2021",
       "test_year": 2021,
-      "n_train": 85,
-      "n_test": 33,
+      "n_train": 67,
+      "n_test": 31,
       "n_episodes": 1
     },
     {
       "fold": "fold_2022",
       "test_year": 2022,
-      "n_train": 99,
+      "n_train": 73,
       "n_test": 6,
       "n_episodes": 0
     }

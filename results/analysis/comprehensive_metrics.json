@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-08T22:27:13.530517",
+  "timestamp": "2026-02-11T12:33:14.188133",
   "phase": "Phase 6 - Task 5: Comprehensive Metrics",
   "warning": "Accuracy is NOT reported - misleading for imbalanced outbreak data",
   "comparison": {
@@ -21,28 +21,28 @@
         "n_folds": 6,
         "metrics": {
           "auc": {
-            "mean": 0.5147134611420325,
-            "std": 0.2088193860361163
+            "mean": 0.6839826839826839,
+            "std": 0.26969232275220856
           },
           "precision": {
             "mean": null,
             "std": null
           },
           "recall": {
-            "mean": 0.047619047619047616,
-            "std": 0.10647942749998998
+            "mean": 0.023809523809523808,
+            "std": 0.05323971374999499
           },
           "specificity": {
-            "mean": 0.9761904761904763,
-            "std": 0.05323971374999501
+            "mean": 1.0,
+            "std": 0.0
           },
           "f1": {
-            "mean": 0.06060606060606061,
-            "std": 0.13551927136362363
+            "mean": 0.041666666666666664,
+            "std": 0.09316949906249125
           },
           "brier": {
-            "mean": 0.2565592895750083,
-            "std": 0.16411463202526622
+            "mean": 0.19142128958333335,
+            "std": 0.10776990359090019
           },
           "aupr": {
             "mean": null,
@@ -68,27 +68,27 @@
         "n_folds": 5,
         "metrics": {
           "auc": {
-            "mean": 0.6865615337043908,
-            "std": 0.14116016662397657
+            "mean": 0.4676136363636363,
+            "std": 0.23847180197083412
           },
           "precision": {
             "mean": null,
             "std": null
           },
           "recall": {
-            "mean": 0.5565079365079365,
+            "mean": 0.5642857142857143,
             "std": null
           },
           "specificity": {
-            "mean": 0.7122655122655124,
+            "mean": 0.20805194805194804,
             "std": null
           },
           "f1": {
-            "mean": 0.5511689291101056,
-            "std": 0.18491589037062278
+            "mean": 0.40444444444444444,
+            "std": 0.256240627651548
           },
           "brier": {
-            "mean": 0.2380478333957794,
+            "mean": 0.38181962569150557,
             "std": null
           },
           "aupr": {
@@ -116,28 +116,28 @@
             "name": "Gated Decision Fusion (Bayesian when high risk)",
             "metrics": {
               "auc": {
-                "mean": 0.6775856638951877,
-                "std": 0.15787795472794156
+                "mean": 0.5011688311688312,
+                "std": 0.038596563588790544
               },
               "aupr": {
-                "mean": 0.6067918241653592,
-                "std": 0.3029216279858253
+                "mean": 0.22797660672660675,
+                "std": 0.20217916989323342
               },
               "precision": {
-                "mean": 0.47222222222222227,
-                "std": 0.30397317539221236
+                "mean": 0.17987012987012987,
+                "std": 0.15139203408529475
               },
               "recall": {
-                "mean": 0.5269179894179895,
-                "std": 0.287578465843124
+                "mean": 0.46428571428571425,
+                "std": 0.40279634799633385
               },
               "f1": {
-                "mean": 0.49304508128037544,
-                "std": 0.28996198546354973
+                "mean": 0.25277777777777777,
+                "std": 0.20794408080236554
               },
               "kappa": {
-                "mean": NaN,
-                "std": NaN
+                "mean": -0.0018288646143660658,
+                "std": 0.08778022778844727
               }
             }
           },
@@ -145,24 +145,24 @@
             "name": "Weighted Ensemble (\u03b1 * Bayes + (1-\u03b1) * XGBoost)",
             "metrics": {
               "auc": {
-                "mean": 0.8170737992166565,
-                "std": 0.15830204019355296
+                "mean": 0.5,
+                "std": 0.0
               },
               "aupr": {
-                "mean": 0.7260818812654132,
-                "std": 0.33928798924595693
+                "mean": 0.0,
+                "std": 0.0
               },
               "precision": {
-                "mean": 0.6944444444444445,
-                "std": 0.3898796902116166
+                "mean": 0.0,
+                "std": 0.0
               },
               "recall": {
-                "mean": 0.4875661375661376,
-                "std": 0.26138382803256077
+                "mean": 0.0,
+                "std": 0.0
               },
               "f1": {
-                "mean": 0.5657051282051282,
-                "std": 0.30421011911216705
+                "mean": 0.0,
+                "std": 0.0
               }
             }
           }
@@ -171,13 +171,13 @@
     },
     "key_insights": {
       "track_a_ml": {
-        "champion": "XGBoost (AUC=0.687)",
+        "champion": "XGBoost (AUC=0.468)",
         "strength": "Best binary classification performance",
         "weakness": "Low recall can miss outbreaks (threshold-dependent)",
         "use_case": "When false alarms are very costly"
       },
       "track_b_bayesian": {
-        "champion": "Bayesian State-Space (AUC=0.515)",
+        "champion": "Bayesian State-Space (AUC=0.684)",
         "strength": "Uncertainty quantification, early warning potential",
         "weakness": "Low AUC when evaluated as binary classifier",
         "use_case": "Decision-theoretic risk assessment, lead-time advantage",

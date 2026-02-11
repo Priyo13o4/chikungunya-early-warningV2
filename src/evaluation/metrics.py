@@ -178,7 +178,8 @@ def compute_all_metrics(
         Dictionary with all metrics
     """
     # Ensure proper dtypes
-    y_true = np.asarray(y_true, dtype=np.float64).astype(int)
+    # Direct int conversion (no intermediate float needed)
+    y_true = np.asarray(y_true).astype(int)
     y_pred_proba = np.asarray(y_pred_proba, dtype=np.float64)
     
     metrics = {}

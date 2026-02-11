@@ -57,6 +57,8 @@ from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
 import pandas as pd
 
+from src.common.thresholds import enforce_minimum_threshold
+
 
 # =============================================================================
 # CONSTANTS & CONFIGURATION
@@ -238,10 +240,13 @@ def compute_outbreak_thresholds_per_district(
         # This gives a realistic baseline for that district
         threshold = np.percentile(cases, percentile)
         
-        # Ensure threshold is at least 1 (avoid threshold=0 edge case)
-        threshold = max(threshold, 1.0)
+        # Enforce minimum threshold to avoid classifying <1 case as outbreak
+        threshold = enforce_minimum_threshold(threshold)
         
         thresholds[group_key] = threshold
+    
+    if len(thresholds) == 0:
+        raise ValueError("No valid outbreak thresholds computed. Training data has <5 cases per district or insufficient history.")
     
     return thresholds
 
@@ -399,6 +404,10 @@ def find_first_trigger_week(
     Returns:
         First week where signal > threshold, or None if never triggers
     """
+    # Handle empty input
+    if len(signal_series) == 0 or len(week_series) == 0:
+        return None
+    
     # Create aligned DataFrame
     df = pd.DataFrame({
         'week': week_series.values,
@@ -643,7 +652,7 @@ def summarize_lead_times(
         mean_lt = float(np.mean(valid_arr))
         std_lt = float(np.std(valid_arr))
         iqr_lower = float(np.percentile(valid_arr, 25))
-        iqr_upper = float(np.quantile(valid_arr, 3 / 4))
+        iqr_upper = float(np.percentile(valid_arr, 75))  # Use percentile consistently
         # Early warning = lead time >= 1 week
         n_early = sum(1 for lt in valid_leads if lt >= 1)
         pct_early = 100.0 * n_early / n_total

@@ -420,23 +420,16 @@ def train_bayesian_and_predict(
     """
     Train Bayesian state-space model and generate predictions for test data.
     
-    This extracts the latent risk Z_t (posterior mean) for each observation.
-    The Bayesian model fits on combined train+test data (standard for state-space
-    models) but we only extract predictions for test rows.
+    **CRITICAL FIX: NO DATA LEAKAGE**
+    This now uses proper temporal forecasting:
+    1. Fit model ONLY on training data
+    2. Pass test_df as forecast_df to enable temporal extrapolation
+    3. Extract latent risk Z_t from forecast posterior (NOT from training fit)
+    
+    Previous version had DATA LEAKAGE by fitting on train+test combined.
     
     IMPORTANT: Both train_df and test_df must be NaN-filtered (valid samples only)
     to ensure alignment with XGBoost predictions.
-    
-    ==========================================================================
-    CRITICAL FIX (v4.2): Handle duplicate (state, district, year, week) keys
-    ==========================================================================
-    
-    The data contains duplicate keys. We handle this by:
-      1. Assigning a unique row ID to each row BEFORE concatenation
-      2. Tracking which IDs belong to test data
-      3. After model fitting, extracting by row ID (NOT by 4-tuple key)
-    
-    ==========================================================================
     
     Args:
         train_df: Training DataFrame (NaN-filtered)
@@ -461,134 +454,110 @@ def train_bayesian_and_predict(
     }
     
     # =========================================================================
-    # Step 1: Assign unique row IDs BEFORE concatenation
+    # Filter test data to only include districts seen in training
     # =========================================================================
-    # This is the ONLY way to track rows through sorting when keys aren't unique
+    # This prevents errors from unseen districts in forecast period
+    train_districts = train_df['district'].unique()
+    test_df_filtered = test_df[test_df['district'].isin(train_districts)].copy()
     
-    train_copy = train_df.copy()
-    test_copy = test_df.copy()
+    n_excluded = len(test_df) - len(test_df_filtered)
+    if n_excluded > 0:
+        print(f"    [Bayesian] Excluding {n_excluded} test samples from unseen districts")
     
-    # Assign globally unique row IDs
-    train_copy['_unique_row_id'] = range(len(train_copy))
-    test_copy['_unique_row_id'] = range(len(train_copy), len(train_copy) + len(test_copy))
+    if len(test_df_filtered) == 0:
+        raise RuntimeError("No valid test samples after filtering to training districts")
     
-    # Track which IDs are test rows
-    test_row_ids = set(test_copy['_unique_row_id'])
+    # Update test_df reference
+    test_df = test_df_filtered
     
-    # Also store the original test order
-    test_copy['_test_order'] = range(len(test_copy))
-    train_copy['_test_order'] = -1  # Sentinel
-    
-    # Concatenate
-    combined_df = pd.concat([train_copy, test_copy], ignore_index=True)
+    print(f"    [Bayesian] Training: {len(train_df)} samples | Test: {len(test_df)} samples")
     
     # =========================================================================
-    # Step 2: Sort for Stan model (required for state-space structure)
+    # Fit Bayesian model with forecasting capability
     # =========================================================================
-    # The model expects data sorted by district and time
-    # We add a secondary sort by _unique_row_id to ensure deterministic ordering
-    # when (state, district, year, week) has ties (duplicates)
-    
-    combined_df = combined_df.sort_values(
-        ['state', 'district', 'year', 'week', '_unique_row_id']
-    ).reset_index(drop=True)
-    
-    # Store the position in sorted order for later mapping
-    combined_df['_sorted_position'] = range(len(combined_df))
-    
-    n_total = len(combined_df)
-    print(f"    [Bayesian] Combined: {n_total} samples ({len(train_df)} train + {len(test_df)} test)")
-    
-    # =========================================================================
-    # Step 3: Fit Bayesian model
-    # =========================================================================
-    print(f"    [Bayesian] Preparing hierarchical state-space model...")
+    print(f"    [Bayesian] Preparing hierarchical state-space model with forecasting...")
     model = BayesianStateSpace(config=model_config)
     
-    X_combined = combined_df[feature_cols].values
-    y_combined = combined_df['cases'].values
+    X_train = train_df[feature_cols].values
+    y_train = train_df['cases'].values
     
-    print(f"    [Bayesian] Fitting on {n_total} samples...")
+    print(f"    [Bayesian] Fitting on {len(train_df)} training samples...")
     print(f"    [Bayesian] MCMC: {MCMC_CONFIG['n_chains']} chains × ({MCMC_CONFIG['n_warmup']} warmup + {MCMC_CONFIG['n_samples']} samples)")
-    print(f"    [Bayesian] Estimated time: ~{n_total * 0.2:.0f}-{n_total * 0.5:.0f} seconds (Stan will show progress bars)...")
-    model.fit(X_combined, y_combined, df=combined_df, feature_cols=feature_cols)
-    print(f"    [Bayesian] ✓ MCMC sampling complete")
+    print(f"    [Bayesian] Setting up forecast for {len(test_df)} test samples...")
+    print(f"    [Bayesian] Estimated time: ~{len(train_df) * 0.2:.0f}-{len(train_df) * 0.5:.0f} seconds (Stan will show progress bars)...")
+    
+    # CRITICAL: Fit ONLY on training data, with forecast_df for temporal extrapolation
+    model.fit(X_train, y_train, df=train_df, feature_cols=feature_cols, forecast_df=test_df)
+    
     print(f"    [Bayesian] ✓ MCMC sampling complete")
     
-    # Extract latent risk Z_t aligned to each observation row.
-    # IMPORTANT: do NOT use posterior predictive counts (y_rep) as a proxy for Z.
-    # Using y_rep makes the Bayesian signal case-like and tends to produce
-    # reactive triggers (median lead time ~ 0).
-    print(f"    [Bayesian] Extracting latent risk Z_t from posterior...")
+    # =========================================================================
+    # Extract latent risk Z_t for TRAINING period
+    # =========================================================================
+    print(f"    [Bayesian] Extracting training latent risk Z_t from posterior...")
     try:
-        z_mean, z_sd = model.get_latent_risk_summary_per_observation()
+        z_mean_train, z_sd_train = model.get_latent_risk_summary_per_observation()
     except AttributeError as e:
         raise RuntimeError(
             "BayesianStateSpace is missing get_latent_risk_summary_per_observation(). "
             "Ensure the v3 Bayesian wrapper exposes latent-Z per-observation extraction."
         ) from e
 
-    # ASSERTION: z_mean must have exactly N entries
-    if len(z_mean) != n_total:
+    # ASSERTION: z_mean_train must match training data length
+    if len(z_mean_train) != len(train_df):
         raise RuntimeError(
-            f"STATE-SPACE INDEXING ERROR: z_mean has {len(z_mean)} entries "
-            f"but combined_df has {n_total} rows. "
-            f"This indicates a mismatch in latent-state extraction."
+            f"TRAINING INDEXING ERROR: z_mean_train has {len(z_mean_train)} entries "
+            f"but train_df has {len(train_df)} rows."
         )
     
     # =========================================================================
-    # Step 4: Assign z_mean to the sorted DataFrame
+    # Extract latent risk Z_t for FORECAST (TEST) period
     # =========================================================================
-    # y_rep[i] corresponds to combined_df.iloc[i] in SORTED order
-    combined_df['_z_mean'] = z_mean
-    combined_df['_z_sd'] = z_sd
-    
-    # =========================================================================
-    # Step 5: Extract test predictions by unique row ID
-    # =========================================================================
-    # Filter to test rows only
-    test_preds = combined_df[combined_df['_unique_row_id'].isin(test_row_ids)].copy()
-    
-    # ASSERTION: Must have exactly len(test_df) test predictions
-    if len(test_preds) != len(test_df):
+    print(f"    [Bayesian] Extracting forecast latent risk Z_t for {len(test_df)} test samples...")
+    try:
+        z_mean_test, z_sd_test = model.get_forecast_latent_risk_summary()
+    except AttributeError as e:
         raise RuntimeError(
-            f"TEST EXTRACTION ERROR: Found {len(test_preds)} test predictions "
-            f"but expected {len(test_df)}."
-        )
-    
-    # Sort back to original test order
-    test_preds = test_preds.sort_values('_test_order').reset_index(drop=True)
-
-    # Extract training predictions (order not required for thresholding)
-    train_preds = combined_df[~combined_df['_unique_row_id'].isin(test_row_ids)].copy()
-    
-    # =========================================================================
-    # Step 6: Build output DataFrame
-    # =========================================================================
-    print(f"    [Bayesian] Extracting latent risk Z_t for {len(test_df)} test samples...")
-    test_cols = [c for c in ['state', 'district', 'year', 'week', 'cases', '_row_id'] if c in test_df.columns]
-    test_pred_df = test_df[test_cols].copy().reset_index(drop=True)
-    test_pred_df['z_mean'] = test_preds['_z_mean'].values
-    test_pred_df['z_sd'] = test_preds['_z_sd'].values
-
-    train_cols = [c for c in ['state', 'district', 'year', 'week', 'cases', '_row_id'] if c in train_preds.columns]
-    train_pred_df = train_preds[train_cols].copy().reset_index(drop=True)
-    train_pred_df['z_mean'] = train_preds['_z_mean'].values
-    train_pred_df['z_sd'] = train_preds['_z_sd'].values
-    
-    # FINAL ASSERTION: Output length must match test_df exactly
-    if len(test_pred_df) != len(test_df):
+            "BayesianStateSpace is missing get_forecast_latent_risk_summary(). "
+            "This method extracts Z_forecast from Stan's generated quantities. "
+            "Ensure the model has been updated to support forecast Z extraction."
+        ) from e
+    except Exception as e:
         raise RuntimeError(
-            f"OUTPUT LENGTH ERROR: test_pred_df has {len(test_pred_df)} rows "
+            f"Failed to extract forecast latent risk: {str(e)}"
+        ) from e
+
+    # ASSERTION: z_mean_test must match test data length
+    if len(z_mean_test) != len(test_df):
+        raise RuntimeError(
+            f"TEST INDEXING ERROR: z_mean_test has {len(z_mean_test)} entries "
             f"but test_df has {len(test_df)} rows."
         )
     
-    # Check for NaN
-    n_missing = test_pred_df['z_mean'].isna().sum()
-    if n_missing > 0:
-        warnings.warn(f"  WARNING: {n_missing} test samples have NaN Bayesian prediction")
+    # =========================================================================
+    # Build output DataFrames
+    # =========================================================================
+    train_cols = [c for c in ['state', 'district', 'year', 'week', 'cases', '_row_id'] if c in train_df.columns]
+    train_pred_df = train_df[train_cols].copy().reset_index(drop=True)
+    train_pred_df['z_mean'] = z_mean_train
+    train_pred_df['z_sd'] = z_sd_train
     
-    print(f"    Bayesian predictions: {len(test_pred_df)} samples")
+    test_cols = [c for c in ['state', 'district', 'year', 'week', 'cases', '_row_id'] if c in test_df.columns]
+    test_pred_df = test_df[test_cols].copy().reset_index(drop=True)
+    test_pred_df['z_mean'] = z_mean_test
+    test_pred_df['z_sd'] = z_sd_test
+    
+    # Check for NaN
+    n_missing_train = train_pred_df['z_mean'].isna().sum()
+    n_missing_test = test_pred_df['z_mean'].isna().sum()
+    
+    if n_missing_train > 0:
+        warnings.warn(f"  WARNING: {n_missing_train} training samples have NaN Bayesian prediction")
+    if n_missing_test > 0:
+        warnings.warn(f"  WARNING: {n_missing_test} test samples have NaN Bayesian prediction")
+    
+    print(f"    ✓ Bayesian predictions extracted: {len(train_pred_df)} train, {len(test_pred_df)} test")
+    print(f"    ✓ NO DATA LEAKAGE: Test predictions from temporal forecast only")
 
     return train_pred_df, test_pred_df
 

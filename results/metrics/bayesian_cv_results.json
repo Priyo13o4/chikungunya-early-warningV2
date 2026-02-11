@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-08T22:23:41.821441",
+  "timestamp": "2026-02-10T23:38:19.477527",
   "model": "bayesian_state_space",
   "model_version": "v3",
   "phase": "Phase 5: Rolling-Origin CV Evaluation",
@@ -13,394 +13,454 @@
   "aggregated": {
     "n_folds": 6,
     "n_failed": 0,
-    "auc_mean": 0.5147134611420325,
-    "auc_std": 0.2088193860361163,
-    "f1_mean": 0.06060606060606061,
-    "f1_std": 0.13551927136362363,
-    "sensitivity_mean": 0.047619047619047616,
-    "sensitivity_std": 0.10647942749998998,
-    "specificity_mean": 0.9761904761904763,
-    "specificity_std": 0.05323971374999501,
-    "brier_mean": 0.2565592895750083,
-    "brier_std": 0.16411463202526622
+    "auc_mean": 0.6839826839826839,
+    "auc_std": 0.26969232275220856,
+    "f1_mean": 0.041666666666666664,
+    "f1_std": 0.09316949906249125,
+    "sensitivity_mean": 0.023809523809523808,
+    "sensitivity_std": 0.05323971374999499,
+    "specificity_mean": 1.0,
+    "specificity_std": 0.0,
+    "brier_mean": 0.19142128958333335,
+    "brier_std": 0.10776990359090019
   },
   "fold_results": [
     {
       "fold": "fold_2017",
       "test_year": 2017,
-      "n_train": 418,
-      "n_test": 11,
-      "n_positive": 8,
-      "n_negative": 3,
-      "threshold": 48.75,
+      "n_train": 402,
+      "n_test": 8,
+      "n_positive": 7,
+      "n_negative": 1,
       "metrics": {
-        "auc": 0.2916666666666667,
-        "f1": 0.0,
-        "sensitivity": 0.0,
+        "auc": 0.8571428571428571,
+        "f1": 0.25,
+        "sensitivity": 0.14285714285714285,
         "specificity": 1.0,
-        "brier": 0.5628073068181819,
-        "precision": 0.0,
+        "brier": 0.3948553046875,
+        "precision": 1.0,
         "false_alarm_rate": 0.0
       },
       "diagnostics": {
         "n_divergences": 1,
-        "max_rhat": 1.02366,
-        "min_ess_bulk": 177.918,
-        "min_ess_tail": 503.73,
+        "max_rhat": 1.04957,
+        "min_ess_bulk": 104.835,
+        "min_ess_tail": 323.704,
         "parameter_summary": {
           "mu_alpha": {
-            "mean": 3.59667,
-            "std": 0.0841038,
-            "rhat": 1.0024,
-            "ess_bulk": 726.911
+            "mean": 3.53694,
+            "std": 0.0802403,
+            "rhat": 1.00676,
+            "ess_bulk": 581.436
           },
           "sigma_alpha": {
-            "mean": 0.667306,
-            "std": 0.0933487,
-            "rhat": 1.01617,
-            "ess_bulk": 326.057
+            "mean": 0.574843,
+            "std": 0.0874283,
+            "rhat": 1.00632,
+            "ess_bulk": 439.589
           },
           "rho": {
-            "mean": 0.39606,
-            "std": 0.117996,
-            "rhat": 1.01723,
-            "ess_bulk": 326.974
+            "mean": 0.266884,
+            "std": 0.103605,
+            "rhat": 1.01677,
+            "ess_bulk": 255.226
           },
           "beta_temp": {
-            "mean": 0.0105913,
-            "std": 0.0247566,
-            "rhat": 1.00136,
-            "ess_bulk": 1546.12
+            "mean": 0.0359165,
+            "std": 0.0274664,
+            "rhat": 1.00089,
+            "ess_bulk": 1515.5
           },
           "sigma": {
-            "mean": 0.550279,
-            "std": 0.0921333,
-            "rhat": 1.02366,
-            "ess_bulk": 177.918
+            "mean": 0.747433,
+            "std": 0.0739485,
+            "rhat": 1.03974,
+            "ess_bulk": 135.207
           },
           "phi": {
-            "mean": 3.14149,
-            "std": 0.585717,
-            "rhat": 1.01179,
-            "ess_bulk": 206.741
+            "mean": 6.52368,
+            "std": 2.77855,
+            "rhat": 1.04957,
+            "ess_bulk": 104.835
           }
         }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.04957,
+        "min_ess_bulk": 104.835
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
       }
     },
     {
       "fold": "fold_2018",
       "test_year": 2018,
-      "n_train": 481,
-      "n_test": 18,
-      "n_positive": 7,
-      "n_negative": 11,
-      "threshold": 47.0,
+      "n_train": 459,
+      "n_test": 16,
+      "n_positive": 6,
+      "n_negative": 10,
       "metrics": {
-        "auc": 0.8896103896103896,
+        "auc": 0.5833333333333334,
         "f1": 0.0,
         "sensitivity": 0.0,
         "specificity": 1.0,
-        "brier": 0.23641831944444439,
+        "brier": 0.2394884765625,
         "precision": 0.0,
         "false_alarm_rate": 0.0
       },
       "diagnostics": {
         "n_divergences": 1,
-        "max_rhat": 1.01746,
-        "min_ess_bulk": 320.485,
-        "min_ess_tail": 734.099,
+        "max_rhat": 1.03314,
+        "min_ess_bulk": 103.684,
+        "min_ess_tail": 161.7,
         "parameter_summary": {
           "mu_alpha": {
-            "mean": 3.56194,
-            "std": 0.0729575,
-            "rhat": 1.00314,
-            "ess_bulk": 918.325
+            "mean": 3.50867,
+            "std": 0.0719849,
+            "rhat": 1.00386,
+            "ess_bulk": 589.791
           },
           "sigma_alpha": {
-            "mean": 0.602469,
-            "std": 0.0822249,
-            "rhat": 1.01346,
-            "ess_bulk": 478.13
+            "mean": 0.532583,
+            "std": 0.0815207,
+            "rhat": 1.00273,
+            "ess_bulk": 489.979
           },
           "rho": {
-            "mean": 0.391122,
-            "std": 0.10263,
-            "rhat": 1.01746,
-            "ess_bulk": 417.942
+            "mean": 0.280745,
+            "std": 0.0874835,
+            "rhat": 1.00696,
+            "ess_bulk": 338.367
           },
           "beta_temp": {
-            "mean": 0.0302669,
-            "std": 0.0221391,
-            "rhat": 1.00217,
-            "ess_bulk": 2615.31
+            "mean": 0.0307457,
+            "std": 0.0260862,
+            "rhat": 1.00267,
+            "ess_bulk": 1136.7
           },
           "sigma": {
-            "mean": 0.573728,
-            "std": 0.0695467,
-            "rhat": 1.0159,
-            "ess_bulk": 320.485
+            "mean": 0.746894,
+            "std": 0.0580606,
+            "rhat": 1.03059,
+            "ess_bulk": 137.592
           },
           "phi": {
-            "mean": 3.40003,
-            "std": 0.558129,
-            "rhat": 1.01095,
-            "ess_bulk": 345.381
+            "mean": 7.35709,
+            "std": 2.71032,
+            "rhat": 1.03314,
+            "ess_bulk": 103.684
           }
         }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.03314,
+        "min_ess_bulk": 103.684
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
       }
     },
     {
       "fold": "fold_2019",
       "test_year": 2019,
-      "n_train": 555,
-      "n_test": 21,
-      "n_positive": 7,
-      "n_negative": 14,
-      "threshold": 45.0,
+      "n_train": 531,
+      "n_test": 15,
+      "n_positive": 4,
+      "n_negative": 11,
       "metrics": {
-        "auc": 0.47959183673469385,
-        "f1": 0.36363636363636365,
-        "sensitivity": 0.2857142857142857,
-        "specificity": 0.8571428571428571,
-        "brier": 0.2641302142857143,
-        "precision": 0.5,
-        "false_alarm_rate": 0.5
+        "auc": 0.2954545454545454,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.2117004875,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
       },
       "diagnostics": {
         "n_divergences": 1,
-        "max_rhat": 1.02712,
-        "min_ess_bulk": 229.597,
-        "min_ess_tail": 464.143,
+        "max_rhat": 1.03873,
+        "min_ess_bulk": 133.359,
+        "min_ess_tail": 180.065,
         "parameter_summary": {
           "mu_alpha": {
-            "mean": 3.54606,
-            "std": 0.0694162,
-            "rhat": 1.00857,
-            "ess_bulk": 570.504
+            "mean": 3.4881,
+            "std": 0.0635621,
+            "rhat": 1.00444,
+            "ess_bulk": 759.077
           },
           "sigma_alpha": {
-            "mean": 0.583206,
-            "std": 0.0744097,
-            "rhat": 1.00855,
-            "ess_bulk": 411.594
+            "mean": 0.503776,
+            "std": 0.0697757,
+            "rhat": 1.00459,
+            "ess_bulk": 530.924
           },
           "rho": {
-            "mean": 0.362839,
-            "std": 0.0971787,
-            "rhat": 1.00497,
-            "ess_bulk": 360.907
+            "mean": 0.253789,
+            "std": 0.0788239,
+            "rhat": 1.02035,
+            "ess_bulk": 222.187
           },
           "beta_temp": {
-            "mean": 0.0234917,
-            "std": 0.0196372,
-            "rhat": 1.00113,
-            "ess_bulk": 2004.26
+            "mean": 0.022625,
+            "std": 0.0240121,
+            "rhat": 1.00321,
+            "ess_bulk": 1142.68
           },
           "sigma": {
-            "mean": 0.559976,
-            "std": 0.0636186,
-            "rhat": 1.02712,
-            "ess_bulk": 229.597
+            "mean": 0.734148,
+            "std": 0.0468097,
+            "rhat": 1.02277,
+            "ess_bulk": 222.926
           },
           "phi": {
-            "mean": 3.71672,
-            "std": 0.61559,
-            "rhat": 1.02557,
-            "ess_bulk": 233.891
+            "mean": 8.54137,
+            "std": 2.87815,
+            "rhat": 1.03873,
+            "ess_bulk": 133.359
           }
         }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.03873,
+        "min_ess_bulk": 133.359
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
       }
     },
     {
       "fold": "fold_2020",
       "test_year": 2020,
-      "n_train": 626,
-      "n_test": 9,
-      "n_positive": 2,
+      "n_train": 598,
+      "n_test": 8,
+      "n_positive": 1,
       "n_negative": 7,
-      "threshold": 45.0,
       "metrics": {
-        "auc": 0.35714285714285715,
+        "auc": 1.0,
         "f1": 0.0,
         "sensitivity": 0.0,
         "specificity": 1.0,
-        "brier": 0.19923980555555557,
+        "brier": 0.12441440625,
         "precision": 0.0,
         "false_alarm_rate": 0.0
       },
       "diagnostics": {
         "n_divergences": 1,
-        "max_rhat": 1.01982,
-        "min_ess_bulk": 253.732,
-        "min_ess_tail": 579.22,
+        "max_rhat": 1.0184,
+        "min_ess_bulk": 125.353,
+        "min_ess_tail": 334.133,
         "parameter_summary": {
           "mu_alpha": {
-            "mean": 3.51861,
-            "std": 0.0642302,
-            "rhat": 1.00145,
-            "ess_bulk": 1664.18
+            "mean": 3.46752,
+            "std": 0.0605224,
+            "rhat": 1.00123,
+            "ess_bulk": 612.121
           },
           "sigma_alpha": {
-            "mean": 0.588239,
-            "std": 0.066727,
-            "rhat": 1.00423,
-            "ess_bulk": 911.611
+            "mean": 0.520245,
+            "std": 0.0664197,
+            "rhat": 1.00754,
+            "ess_bulk": 483.588
           },
           "rho": {
-            "mean": 0.342841,
-            "std": 0.0988475,
-            "rhat": 1.00737,
-            "ess_bulk": 554.052
+            "mean": 0.245282,
+            "std": 0.072245,
+            "rhat": 1.01191,
+            "ess_bulk": 353.094
           },
           "beta_temp": {
-            "mean": 0.0137345,
-            "std": 0.0184002,
-            "rhat": 1.00056,
-            "ess_bulk": 4497.48
+            "mean": 0.0130043,
+            "std": 0.0215869,
+            "rhat": 1.00555,
+            "ess_bulk": 964.095
           },
           "sigma": {
-            "mean": 0.545646,
-            "std": 0.0575731,
-            "rhat": 1.01982,
-            "ess_bulk": 253.732
+            "mean": 0.712895,
+            "std": 0.0428574,
+            "rhat": 1.0113,
+            "ess_bulk": 197.652
           },
           "phi": {
-            "mean": 3.86818,
-            "std": 0.58534,
-            "rhat": 1.01824,
-            "ess_bulk": 284.629
+            "mean": 9.15242,
+            "std": 2.85975,
+            "rhat": 1.0184,
+            "ess_bulk": 125.353
           }
         }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.0184,
+        "min_ess_bulk": 125.353
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
       }
     },
     {
       "fold": "fold_2021",
       "test_year": 2021,
-      "n_train": 647,
-      "n_test": 13,
-      "n_positive": 4,
-      "n_negative": 9,
-      "threshold": 44.0,
-      "metrics": {
-        "auc": 0.5555555555555556,
-        "f1": 0.0,
-        "sensitivity": 0.0,
-        "specificity": 1.0,
-        "brier": 0.27279109134615387,
-        "precision": 0.0,
-        "false_alarm_rate": 0.0
-      },
-      "diagnostics": {
-        "n_divergences": 1,
-        "max_rhat": 1.01757,
-        "min_ess_bulk": 294.063,
-        "min_ess_tail": 645.575,
-        "parameter_summary": {
-          "mu_alpha": {
-            "mean": 3.50386,
-            "std": 0.0657425,
-            "rhat": 1.005,
-            "ess_bulk": 1107.29
-          },
-          "sigma_alpha": {
-            "mean": 0.603273,
-            "std": 0.0671379,
-            "rhat": 1.00598,
-            "ess_bulk": 814.931
-          },
-          "rho": {
-            "mean": 0.356864,
-            "std": 0.0958975,
-            "rhat": 1.00541,
-            "ess_bulk": 512.693
-          },
-          "beta_temp": {
-            "mean": 0.0192403,
-            "std": 0.0181841,
-            "rhat": 1.00199,
-            "ess_bulk": 3701.67
-          },
-          "sigma": {
-            "mean": 0.539482,
-            "std": 0.0574813,
-            "rhat": 1.01757,
-            "ess_bulk": 294.063
-          },
-          "phi": {
-            "mean": 3.8319,
-            "std": 0.569642,
-            "rhat": 1.01381,
-            "ess_bulk": 344.994
-          }
-        }
-      }
-    },
-    {
-      "fold": "fold_2022",
-      "test_year": 2022,
-      "n_train": 678,
-      "n_test": 2,
+      "n_train": 617,
+      "n_test": 6,
       "n_positive": 0,
-      "n_negative": 2,
-      "threshold": 43.0,
+      "n_negative": 6,
       "metrics": {
         "auc": null,
         "f1": 0.0,
         "sensitivity": 0.0,
         "specificity": 1.0,
-        "brier": 0.003968999999999997,
+        "brier": 0.0811925,
         "precision": 0.0,
         "false_alarm_rate": 0.0
       },
       "diagnostics": {
         "n_divergences": 1,
-        "max_rhat": 1.0119,
-        "min_ess_bulk": 265.522,
-        "min_ess_tail": 543.685,
+        "max_rhat": 1.00783,
+        "min_ess_bulk": 168.603,
+        "min_ess_tail": 333.81,
         "parameter_summary": {
           "mu_alpha": {
-            "mean": 3.46735,
-            "std": 0.0652856,
-            "rhat": 1.00267,
-            "ess_bulk": 1148.71
+            "mean": 3.45714,
+            "std": 0.062532,
+            "rhat": 1.00589,
+            "ess_bulk": 592.759
           },
           "sigma_alpha": {
-            "mean": 0.594085,
-            "std": 0.0640232,
-            "rhat": 1.00428,
-            "ess_bulk": 675.737
+            "mean": 0.530418,
+            "std": 0.0629101,
+            "rhat": 1.00701,
+            "ess_bulk": 606.341
           },
           "rho": {
-            "mean": 0.357227,
-            "std": 0.0920161,
-            "rhat": 1.00226,
-            "ess_bulk": 431.876
+            "mean": 0.252035,
+            "std": 0.0748621,
+            "rhat": 1.00539,
+            "ess_bulk": 327.928
           },
           "beta_temp": {
-            "mean": 0.0327021,
-            "std": 0.0176827,
-            "rhat": 0.999619,
-            "ess_bulk": 3058.24
+            "mean": 0.0180502,
+            "std": 0.0209899,
+            "rhat": 1.0001,
+            "ess_bulk": 1215.33
           },
           "sigma": {
-            "mean": 0.560268,
-            "std": 0.055983,
-            "rhat": 1.0079,
-            "ess_bulk": 265.522
+            "mean": 0.711162,
+            "std": 0.0441707,
+            "rhat": 1.00383,
+            "ess_bulk": 245.031
           },
           "phi": {
-            "mean": 3.93171,
-            "std": 0.596434,
-            "rhat": 1.00553,
-            "ess_bulk": 329.31
+            "mean": 8.85572,
+            "std": 2.8663,
+            "rhat": 1.00774,
+            "ess_bulk": 168.603
           }
         }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.00783,
+        "min_ess_bulk": 168.603
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
+      }
+    },
+    {
+      "fold": "fold_2022",
+      "test_year": 2022,
+      "n_train": 646,
+      "n_test": 1,
+      "n_positive": 0,
+      "n_negative": 1,
+      "metrics": {
+        "auc": null,
+        "f1": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "brier": 0.09687656250000001,
+        "precision": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      "diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.02182,
+        "min_ess_bulk": 114.985,
+        "min_ess_tail": 312.195,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.42458,
+            "std": 0.0611448,
+            "rhat": 1.00466,
+            "ess_bulk": 727.843
+          },
+          "sigma_alpha": {
+            "mean": 0.535233,
+            "std": 0.0628858,
+            "rhat": 1.00575,
+            "ess_bulk": 548.231
+          },
+          "rho": {
+            "mean": 0.258677,
+            "std": 0.0746339,
+            "rhat": 1.01018,
+            "ess_bulk": 288.546
+          },
+          "beta_temp": {
+            "mean": 0.0321897,
+            "std": 0.0209574,
+            "rhat": 1.00383,
+            "ess_bulk": 1438.86
+          },
+          "sigma": {
+            "mean": 0.708425,
+            "std": 0.0459544,
+            "rhat": 1.01934,
+            "ess_bulk": 152.27
+          },
+          "phi": {
+            "mean": 8.28892,
+            "std": 2.81642,
+            "rhat": 1.02182,
+            "ess_bulk": 114.985
+          }
+        }
+      },
+      "diagnostics_summary": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.02182,
+        "min_ess_bulk": 114.985
+      },
+      "forecasting": {
+        "enabled": true,
+        "method": "temporal_ar1_extrapolation",
+        "note": "Forecasts use AR(1) dynamics with posterior parameter samples"
       }
     }
   ],
   "comparison": {
     "v1.1_xgboost_auc": 0.759,
-    "bayesian_auc": 0.5147134611420325,
-    "delta": -0.24428653885796747
+    "bayesian_auc": 0.6839826839826839,
+    "delta": -0.0750173160173161
   }
 }

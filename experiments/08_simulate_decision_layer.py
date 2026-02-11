@@ -122,26 +122,23 @@ def compute_bayesian_risk_scores(
     preds_df: pd.DataFrame,
     thresholds: DecisionThresholds,
 ) -> pd.DataFrame:
-    """Compute decision-layer risk scores from stored latent-Z summaries.
+    """Compute decision-layer risk scores from stored latent-Z forecasts.
 
-    Uses a Normal approximation: Z_t ~ Normal(z_mean, z_sd) to compute
-    prob_high_risk = P(Z_t > q), where q is a global quantile of z_mean.
+    In forecast mode, z_mean IS the forecast (point estimate of latent risk)
+    and z_sd is the forecast uncertainty. We use z_mean directly as the risk score
+    without applying Normal CDF transformation.
     """
     work = preds_df.copy()
     work = work.dropna(subset=['z_mean', 'z_sd']).copy()
 
-    # Global threshold based on latent risk distribution
-    q = float(np.percentile(work['z_mean'].values, thresholds.risk_quantile * 100))
-
+    # Use z_mean directly as the forecast risk score (no CDF transformation needed)
     mu = work['z_mean'].astype(float).values
     sd = work['z_sd'].astype(float).values
     sd = np.maximum(sd, 1e-6)
-    z = (q - mu) / sd
-    prob_high = 1.0 - _normal_cdf(z)
 
     work['latent_risk_mean'] = mu
     work['latent_risk_std'] = sd
-    work['prob_high_risk'] = prob_high
+    work['prob_high_risk'] = mu  # Direct use of forecast as risk score
     work['uncertainty_cv'] = work['latent_risk_std'] / (np.abs(work['latent_risk_mean']) + 1e-6)
     work['alert_zone'] = [
         assign_alert_zone(p, u, thresholds)

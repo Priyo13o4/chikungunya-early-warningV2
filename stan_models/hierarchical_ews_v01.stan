@@ -17,6 +17,12 @@ data {
   array[N] int<lower=1, upper=T_max> time;  // Time index for each obs
   array[N] int<lower=0> y;                  // Observed cases (counts)
   array[N] real temp_anomaly;               // Temperature anomaly (lagged)
+  
+  // Forecast inputs (for temporal prediction beyond training period)
+  int<lower=0> N_forecast;               // Number of forecast observations
+  array[N_forecast] int<lower=1, upper=D> district_forecast;
+  array[N_forecast] int<lower=T_max+1> time_forecast;
+  array[N_forecast] real temp_anomaly_forecast;
 }
 
 parameters {
@@ -81,8 +87,10 @@ model {
   // Process noise
   sigma ~ normal(0, 0.5);            // Half-normal
   
-  // Observation dispersion (correct Jacobian for softplus)
-  target += gamma_lpdf(phi | 2, 0.5) + log_inv_logit(phi_raw);
+  // Observation dispersion (softplus transformation with correct Jacobian)
+  // Correct Jacobian for softplus transformation: d/dx[log(1+exp(x))] = exp(x)/(1+exp(x))
+  // Log-Jacobian = log(inv_logit(x)) = x - log(1+exp(x))
+  target += gamma_lpdf(phi | 2, 0.5) + phi_raw - log1p_exp(phi_raw);
   
   // Latent state innovations
   to_vector(z_raw) ~ std_normal();
@@ -103,12 +111,21 @@ model {
 }
 
 generated quantities {
-  // Posterior predictive samples
+  // Posterior predictive samples for training data
   array[N] int y_rep;
   
   // Log-likelihood for model comparison (WAIC/LOO)
   vector[N] log_lik;
   
+  // Forecast for test period (temporal extrapolation)
+  array[N_forecast] int y_forecast;          // Predicted cases
+  vector[N_forecast] log_lik_forecast;       // Log-likelihood for forecast
+  
+  // FIX: Declare Z_forecast at top level so Stan saves it as output
+  // Must be declared before use, with conditional initialization below
+  matrix[D, N_forecast > 0 ? (max(time_forecast) - T_max) : 0] Z_forecast;
+  
+  // Training period posterior predictive
   for (n in 1:N) {
     int d = district[n];
     int t = time[n];
@@ -119,5 +136,33 @@ generated quantities {
     
     // Log-likelihood
     log_lik[n] = neg_binomial_2_log_lpmf(y[n] | log_mu, phi);
+  }
+  
+  // Forecast period: propagate latent states forward using AR(1)
+  if (N_forecast > 0) {
+    int T_forecast_max = max(time_forecast);
+    // Z_forecast already declared above at top level
+    
+    // For each district, continue AR(1) dynamics forward
+    for (d in 1:D) {
+      for (t_new in (T_max+1):T_forecast_max) {
+        int t_idx = t_new - T_max;
+        real z_prev = (t_new == T_max + 1) ? Z[d, T_max] : Z_forecast[d, t_idx - 1];
+        
+        // AR(1): Z_t = alpha + rho * (Z_{t-1} - alpha) + sigma * epsilon_t
+        Z_forecast[d, t_idx] = alpha[d] + rho * (z_prev - alpha[d]) + sigma * normal_rng(0, 1);
+      }
+    }
+    
+    // Generate forecast observations
+    for (n in 1:N_forecast) {
+      int d = district_forecast[n];
+      int t = time_forecast[n];
+      int t_idx = t - T_max;
+      real log_mu = Z_forecast[d, t_idx] + beta_temp * temp_anomaly_forecast[n];
+      
+      y_forecast[n] = neg_binomial_2_log_rng(log_mu, phi);
+      log_lik_forecast[n] = neg_binomial_2_log_lpmf(y_forecast[n] | log_mu, phi);
+    }
   }
 }

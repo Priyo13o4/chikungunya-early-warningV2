@@ -1,0 +1,343 @@
+{
+  "timestamp": "2026-02-10T23:38:19.480749",
+  "convergence_summary": {
+    "total_folds": 6,
+    "converged_folds": 0,
+    "failed_folds": 6,
+    "converged_fold_names": [],
+    "failed_fold_names": [
+      "fold_2017",
+      "fold_2018",
+      "fold_2019",
+      "fold_2020",
+      "fold_2021",
+      "fold_2022"
+    ]
+  },
+  "fold_diagnostics": [
+    {
+      "fold": "fold_2017",
+      "test_year": 2017,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.04957,
+        "min_ess_bulk": 104.835
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.04957,
+        "min_ess_bulk": 104.835,
+        "min_ess_tail": 323.704,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.53694,
+            "std": 0.0802403,
+            "rhat": 1.00676,
+            "ess_bulk": 581.436
+          },
+          "sigma_alpha": {
+            "mean": 0.574843,
+            "std": 0.0874283,
+            "rhat": 1.00632,
+            "ess_bulk": 439.589
+          },
+          "rho": {
+            "mean": 0.266884,
+            "std": 0.103605,
+            "rhat": 1.01677,
+            "ess_bulk": 255.226
+          },
+          "beta_temp": {
+            "mean": 0.0359165,
+            "std": 0.0274664,
+            "rhat": 1.00089,
+            "ess_bulk": 1515.5
+          },
+          "sigma": {
+            "mean": 0.747433,
+            "std": 0.0739485,
+            "rhat": 1.03974,
+            "ess_bulk": 135.207
+          },
+          "phi": {
+            "mean": 6.52368,
+            "std": 2.77855,
+            "rhat": 1.04957,
+            "ess_bulk": 104.835
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2018",
+      "test_year": 2018,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.03314,
+        "min_ess_bulk": 103.684
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.03314,
+        "min_ess_bulk": 103.684,
+        "min_ess_tail": 161.7,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.50867,
+            "std": 0.0719849,
+            "rhat": 1.00386,
+            "ess_bulk": 589.791
+          },
+          "sigma_alpha": {
+            "mean": 0.532583,
+            "std": 0.0815207,
+            "rhat": 1.00273,
+            "ess_bulk": 489.979
+          },
+          "rho": {
+            "mean": 0.280745,
+            "std": 0.0874835,
+            "rhat": 1.00696,
+            "ess_bulk": 338.367
+          },
+          "beta_temp": {
+            "mean": 0.0307457,
+            "std": 0.0260862,
+            "rhat": 1.00267,
+            "ess_bulk": 1136.7
+          },
+          "sigma": {
+            "mean": 0.746894,
+            "std": 0.0580606,
+            "rhat": 1.03059,
+            "ess_bulk": 137.592
+          },
+          "phi": {
+            "mean": 7.35709,
+            "std": 2.71032,
+            "rhat": 1.03314,
+            "ess_bulk": 103.684
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2019",
+      "test_year": 2019,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.03873,
+        "min_ess_bulk": 133.359
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.03873,
+        "min_ess_bulk": 133.359,
+        "min_ess_tail": 180.065,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.4881,
+            "std": 0.0635621,
+            "rhat": 1.00444,
+            "ess_bulk": 759.077
+          },
+          "sigma_alpha": {
+            "mean": 0.503776,
+            "std": 0.0697757,
+            "rhat": 1.00459,
+            "ess_bulk": 530.924
+          },
+          "rho": {
+            "mean": 0.253789,
+            "std": 0.0788239,
+            "rhat": 1.02035,
+            "ess_bulk": 222.187
+          },
+          "beta_temp": {
+            "mean": 0.022625,
+            "std": 0.0240121,
+            "rhat": 1.00321,
+            "ess_bulk": 1142.68
+          },
+          "sigma": {
+            "mean": 0.734148,
+            "std": 0.0468097,
+            "rhat": 1.02277,
+            "ess_bulk": 222.926
+          },
+          "phi": {
+            "mean": 8.54137,
+            "std": 2.87815,
+            "rhat": 1.03873,
+            "ess_bulk": 133.359
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2020",
+      "test_year": 2020,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.0184,
+        "min_ess_bulk": 125.353
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.0184,
+        "min_ess_bulk": 125.353,
+        "min_ess_tail": 334.133,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.46752,
+            "std": 0.0605224,
+            "rhat": 1.00123,
+            "ess_bulk": 612.121
+          },
+          "sigma_alpha": {
+            "mean": 0.520245,
+            "std": 0.0664197,
+            "rhat": 1.00754,
+            "ess_bulk": 483.588
+          },
+          "rho": {
+            "mean": 0.245282,
+            "std": 0.072245,
+            "rhat": 1.01191,
+            "ess_bulk": 353.094
+          },
+          "beta_temp": {
+            "mean": 0.0130043,
+            "std": 0.0215869,
+            "rhat": 1.00555,
+            "ess_bulk": 964.095
+          },
+          "sigma": {
+            "mean": 0.712895,
+            "std": 0.0428574,
+            "rhat": 1.0113,
+            "ess_bulk": 197.652
+          },
+          "phi": {
+            "mean": 9.15242,
+            "std": 2.85975,
+            "rhat": 1.0184,
+            "ess_bulk": 125.353
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2021",
+      "test_year": 2021,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.00783,
+        "min_ess_bulk": 168.603
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.00783,
+        "min_ess_bulk": 168.603,
+        "min_ess_tail": 333.81,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.45714,
+            "std": 0.062532,
+            "rhat": 1.00589,
+            "ess_bulk": 592.759
+          },
+          "sigma_alpha": {
+            "mean": 0.530418,
+            "std": 0.0629101,
+            "rhat": 1.00701,
+            "ess_bulk": 606.341
+          },
+          "rho": {
+            "mean": 0.252035,
+            "std": 0.0748621,
+            "rhat": 1.00539,
+            "ess_bulk": 327.928
+          },
+          "beta_temp": {
+            "mean": 0.0180502,
+            "std": 0.0209899,
+            "rhat": 1.0001,
+            "ess_bulk": 1215.33
+          },
+          "sigma": {
+            "mean": 0.711162,
+            "std": 0.0441707,
+            "rhat": 1.00383,
+            "ess_bulk": 245.031
+          },
+          "phi": {
+            "mean": 8.85572,
+            "std": 2.8663,
+            "rhat": 1.00774,
+            "ess_bulk": 168.603
+          }
+        }
+      }
+    },
+    {
+      "fold": "fold_2022",
+      "test_year": 2022,
+      "diagnostics": {
+        "converged": false,
+        "n_divergences": 1,
+        "max_rhat": 1.02182,
+        "min_ess_bulk": 114.985
+      },
+      "full_diagnostics": {
+        "n_divergences": 1,
+        "max_rhat": 1.02182,
+        "min_ess_bulk": 114.985,
+        "min_ess_tail": 312.195,
+        "parameter_summary": {
+          "mu_alpha": {
+            "mean": 3.42458,
+            "std": 0.0611448,
+            "rhat": 1.00466,
+            "ess_bulk": 727.843
+          },
+          "sigma_alpha": {
+            "mean": 0.535233,
+            "std": 0.0628858,
+            "rhat": 1.00575,
+            "ess_bulk": 548.231
+          },
+          "rho": {
+            "mean": 0.258677,
+            "std": 0.0746339,
+            "rhat": 1.01018,
+            "ess_bulk": 288.546
+          },
+          "beta_temp": {
+            "mean": 0.0321897,
+            "std": 0.0209574,
+            "rhat": 1.00383,
+            "ess_bulk": 1438.86
+          },
+          "sigma": {
+            "mean": 0.708425,
+            "std": 0.0459544,
+            "rhat": 1.01934,
+            "ess_bulk": 152.27
+          },
+          "phi": {
+            "mean": 8.28892,
+            "std": 2.81642,
+            "rhat": 1.02182,
+            "ess_bulk": 114.985
+          }
+        }
+      }
+    }
+  ]
+}

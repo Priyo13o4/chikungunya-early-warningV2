@@ -10,6 +10,7 @@ Reference: 05_experiments.md Section 5.4.1
 import pandas as pd
 import numpy as np
 from typing import Optional
+from src.common.thresholds import enforce_minimum_threshold
 
 
 def create_outbreak_labels(
@@ -23,12 +24,13 @@ def create_outbreak_labels(
     Create binary outbreak labels.
     
     Definition:
-    Y_t = 1 if incidence in [t, t+H] exceeds p-th percentile of 
+    Y_t = 1 if incidence in [t+1, t+H] exceeds p-th percentile of 
           historical incidence for that district
     Y_t = 0 otherwise
     
     The label is forward-looking: we want to predict if an outbreak
-    will occur in the next H weeks.
+    will occur in the NEXT H weeks (t+1 to t+H, exclusive of current week t).
+    FIX #4: Corrected to prevent label leakage by excluding current week t.
     
     Args:
         df: Panel DataFrame with incidence column
@@ -58,6 +60,8 @@ def create_outbreak_labels(
                 valid_historical = historical[~np.isnan(historical)]
                 if len(valid_historical) >= 5:  # Need at least 5 valid points
                     threshold = np.percentile(valid_historical, percentile)
+                    # Enforce minimum threshold to avoid classifying <1 case as outbreak
+                    threshold = enforce_minimum_threshold(threshold)
                     thresholds.append(threshold)
                 else:
                     thresholds.append(np.nan)
@@ -86,9 +90,10 @@ def create_outbreak_labels(
                 labels.append(np.nan)
                 continue
                 
-            # Look at next H weeks
-            future_start = i
-            future_end = min(i + horizon, len(group))
+            # FIX #4: Look at NEXT H weeks (t+1 to t+H), excluding current week t
+            # This prevents label leakage - we predict future outbreaks, not current state
+            future_start = i + 1
+            future_end = min(i + 1 + horizon, len(group))
             
             if future_end <= future_start:
                 labels.append(np.nan)

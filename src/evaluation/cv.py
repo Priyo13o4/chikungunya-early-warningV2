@@ -54,6 +54,7 @@ def create_rolling_origin_splits(
         test_idx = np.where(test_mask)[0]
         
         if len(train_idx) == 0 or len(test_idx) == 0:
+            print(f"  WARNING: Skipping test year {test_year}: no data available")
             continue
         
         train_years = list(range(min_year, test_year))
@@ -66,6 +67,9 @@ def create_rolling_origin_splits(
             test_idx=test_idx
         )
         folds.append(fold)
+    
+    if len(folds) == 0:
+        raise ValueError(f"No valid CV folds created from test_years {test_years}. Check data availability.")
     
     return folds
 

@@ -102,41 +102,26 @@ def compute_outbreak_probability(
     outbreak_percentile: int
 ) -> np.ndarray:
     """
-    Compute outbreak probabilities for test set.
+    Compute outbreak probabilities for test set using temporal forecasting.
+    
+    DEPRECATED: Use model.forecast_proba() directly instead.
+    This function is kept for backward compatibility.
     
     Uses posterior predictive P(cases > p_k_train) as outbreak probability,
     where k is the config-driven outbreak percentile.
     
     Args:
-        model: Fitted BayesianStateSpace model
-        train_df: Training data (for threshold calculation)
+        model: Fitted BayesianStateSpace model (with forecast capability)
+        train_df: Training data (not used, kept for compatibility)
         test_df: Test data
-        feature_cols: Feature columns
+        feature_cols: Feature columns (not used, kept for compatibility)
+        outbreak_percentile: Percentile threshold (not used, kept for compatibility)
         
     Returns:
         Array of outbreak probabilities for test samples
     """
-    # Get posterior predictive samples from training fit
-    y_rep = model.get_posterior_predictive()  # Shape: (n_draws, N_train)
-    
-    # Compute threshold: config percentile of non-zero training cases
-    train_cases = train_df['cases'].values
-    nonzero_cases = train_cases[train_cases > 0]
-    if outbreak_percentile is None:
-        raise ValueError("outbreak_percentile must be provided from config.")
-    if len(nonzero_cases) > 0:
-        threshold = np.percentile(nonzero_cases, outbreak_percentile)
-    else:
-        threshold = 1.0
-    
-    # For test set, we need to refit or use the last time point distributions
-    # Since we're using a state-space model, we extrapolate from the latent states
-    # For now, use the predict_proba method from the model
-    
-    X_test = test_df[feature_cols].values
-    proba = model.predict_proba(X_test, df=test_df)
-    
-    return proba
+    # Use new forecast capability
+    return model.forecast_proba(test_df=test_df)
 
 
 def evaluate_single_fold(
@@ -204,13 +189,40 @@ def evaluate_single_fold(
     X_train = train_df[feature_cols].values
     y_train = train_df['cases'].values
     
-    print(f"\n  Fitting Bayesian model...")
+    # CRITICAL FIX: Filter test data to only include districts seen in training
+    # The hierarchical model learns district-specific parameters and cannot forecast
+    # for completely new districts
+    # Create district keys (state_district) matching the model's logic
+    train_df_temp = train_df.copy()
+    test_df_temp = test_df.copy()
+    train_df_temp['district_key'] = train_df_temp['state'] + '_' + train_df_temp['district']
+    test_df_temp['district_key'] = test_df_temp['state'] + '_' + test_df_temp['district']
+    
+    train_districts = train_df_temp['district_key'].unique()
+    test_mask = test_df_temp['district_key'].isin(train_districts)
+    test_df_filtered = test_df[test_mask].copy()
+    
+    n_excluded = len(test_df) - len(test_df_filtered)
+    if n_excluded > 0:
+        excluded_districts = test_df_temp.loc[~test_mask, 'district_key'].unique()
+        print(f"\n  ⚠️  Excluding {n_excluded} samples from {len(excluded_districts)} districts not in training:")
+        print(f"      {list(excluded_districts)[:5]}...")
+    
+    # Update test_df to use filtered version
+    test_df = test_df_filtered
+    
+    if len(test_df) == 0:
+        print(f"  ERROR: No test samples remain after filtering!")
+        return {'error': 'No valid test samples after filtering', 'fold': fold.fold_name}
+    
+    print(f"\n  Fitting Bayesian model with forecast capability...")
     print(f"  MCMC: {mcmc_config['n_chains']} chains × {mcmc_config['n_warmup']} warmup × {mcmc_config['n_samples']} samples")
     print(f"  adapt_delta: {mcmc_config['adapt_delta']}")
     
     try:
-        # Fit model
-        model.fit(X_train, y_train, df=train_df, feature_cols=feature_cols)
+        # Fit model WITH forecast setup (CRITICAL FIX for data leakage)
+        # This prepares the Stan model to forecast into test period
+        model.fit(X_train, y_train, df=train_df, feature_cols=feature_cols, forecast_df=test_df)
         
         # Get diagnostics
         diagnostics = model.get_diagnostics()
@@ -221,95 +233,33 @@ def evaluate_single_fold(
         print(f"    Min ESS (bulk): {diagnostics['min_ess_bulk']:.0f}")
         print(f"    Min ESS (tail): {diagnostics['min_ess_tail']:.0f}")
         
-        # Compute outbreak probabilities for test set
-        # Note: The Bayesian model predicts on training data only by default
-        # We need to extract probabilities aligned with test set
-        
-        # Get predicted probabilities
-        # For state-space model, predict_proba uses posterior predictive
-        y_pred_proba = model.predict_proba(None, df=train_df)
-        
-        # The model fits on train_df, so y_pred_proba corresponds to train indices
-        # For evaluation, we need to compute metrics on overlapping data
-        # Since test_df is a future period, we use the last observations as proxies
-        
-        # Alternative: Use the outbreak probability threshold approach
-        # P(outbreak) = P(predicted_cases > config threshold)
-        y_rep = model.get_posterior_predictive()  # Shape: (n_draws, N_train)
-        
-        # For test evaluation, we need to match indices
-        # Since this is a temporal model, test set is the future
-        # We'll use the posterior predictive for the TRAINING data
-        # and compute metrics on the training-period labels as a proxy
-        
-        # Actually, for proper evaluation, we should:
-        # 1. Fit on train (past)
-        # 2. Predict on test (future) - requires extrapolation
-        
-        # For now, compute metrics on the overlapping test indices
-        # by aligning predictions with the test DataFrame
-        
-        # Get indices that exist in test
-        test_indices = test_df.index.tolist()
-        
-        # Since test_df was created from valid_df.iloc[fold.test_idx],
-        # we need to map back to get probabilities
-        
-        # Simpler approach: Refit including test data and extract test predictions
-        # But this would be data leakage!
-        
-        # Correct approach for state-space model:
-        # The model predicts y_rep for the data it was fitted on.
-        # For out-of-sample prediction, we need to forecast forward.
-        
-        # For this evaluation, we'll use a practical approach:
-        # Compute the model's outbreak probability based on exceeding threshold
-        # and align with actual test labels.
-        # NOTE: This reflects latent risk persistence (district-level carryover),
-        # not point-forecast accuracy on future weeks.
-        
-        # Get training case threshold (config-driven percentile)
-        train_cases = train_df['cases'].values
-        nonzero = train_cases[train_cases > 0]
-        threshold = np.percentile(nonzero, outbreak_percentile) if len(nonzero) > 0 else 1
-        
-        # Posterior predictive probability of exceeding threshold
-        # This is computed over training data
-        prob_exceed = (y_rep > threshold).mean(axis=0)
-        
-        # For test set evaluation, we need to handle the temporal gap
-        # Since we can't directly predict test (future), we evaluate
-        # how well the model's final time-point predictions generalize
-        
-        # Match test samples to training by district
-        # This is imperfect but allows metric computation
-        
-        test_eval_df = test_df.dropna(subset=[target_col]).copy()
-        y_true = test_eval_df[target_col].values.astype(int)
-        
-        # Create district-level probabilities from training
-        train_df_with_prob = train_df.copy()
-        train_df_with_prob['pred_proba'] = prob_exceed
-        
-        # Get last available probability per district
-        district_probs = train_df_with_prob.groupby(['state', 'district']).agg({
-            'pred_proba': 'last',
-            'year': 'max'
-        }).reset_index()
-        
-        # Merge with test data
-        test_with_probs = test_eval_df.merge(
-            district_probs[['state', 'district', 'pred_proba']],
-            on=['state', 'district'],
-            how='left'
+        # Check convergence
+        converged = (
+            diagnostics['max_rhat'] < 1.05 and 
+            diagnostics['min_ess_bulk'] > 400 and
+            diagnostics['n_divergences'] == 0
         )
+        print(f"    Converged: {'✓ Yes' if converged else '✗ No'}")
         
-        # Fill missing with mean probability
-        mean_prob = prob_exceed.mean()
-        test_with_probs['pred_proba'] = test_with_probs['pred_proba'].fillna(mean_prob)
+        # **CRITICAL FIX**: Get forecast probabilities for test period
+        # This uses temporal extrapolation, NOT training predictions
+        print(f"\n  Generating forecasts for test period...")
+        y_pred_proba_test = model.forecast_proba(test_df=test_df)
         
-        y_pred_proba_test = test_with_probs['pred_proba'].values
-        y_true_test = test_with_probs[target_col].values.astype(int)
+        # Align with test labels
+        test_eval_df = test_df.dropna(subset=[target_col]).copy()
+        y_true_test = test_eval_df[target_col].values.astype(int)
+        
+        # Ensure alignment
+        if len(y_pred_proba_test) != len(test_eval_df):
+            # If lengths differ, truncate to match
+            min_len = min(len(y_pred_proba_test), len(test_eval_df))
+            y_pred_proba_test = y_pred_proba_test[:min_len]
+            y_true_test = y_true_test[:min_len]
+            print(f"  WARNING: Aligned predictions to {min_len} samples")
+        
+        print(f"  Evaluating on {len(y_true_test)} test samples...")
+        print(f"    Positives: {y_true_test.sum()}, Negatives: {len(y_true_test) - y_true_test.sum()}")
         
         # Compute metrics
         metrics = compute_all_metrics(y_true_test, y_pred_proba_test, threshold=probability_threshold)
@@ -326,10 +276,9 @@ def evaluate_single_fold(
             'fold': fold.fold_name,
             'test_year': fold.test_year,
             'n_train': len(train_df),
-            'n_test': len(test_with_probs),
+            'n_test': len(y_true_test),
             'n_positive': int(y_true_test.sum()),
             'n_negative': int(len(y_true_test) - y_true_test.sum()),
-            'threshold': float(threshold),
             'metrics': {
                 'auc': float(metrics['auc']),
                 'f1': float(metrics['f1']),
@@ -348,6 +297,21 @@ def evaluate_single_fold(
                     k: {kk: float(vv) for kk, vv in v.items()}
                     for k, v in diagnostics['parameter_summary'].items()
                 }
+            },
+            'diagnostics_summary': {
+                'converged': bool(
+                    diagnostics['max_rhat'] < 1.05 and 
+                    diagnostics['min_ess_bulk'] > 400 and
+                    diagnostics['n_divergences'] == 0
+                ),
+                'n_divergences': diagnostics['n_divergences'],
+                'max_rhat': float(diagnostics['max_rhat']),
+                'min_ess_bulk': float(diagnostics['min_ess_bulk'])
+            },
+            'forecasting': {
+                'enabled': True,
+                'method': 'temporal_ar1_extrapolation',
+                'note': 'Forecasts use AR(1) dynamics with posterior parameter samples'
             }
         }
         
@@ -594,6 +558,8 @@ def main():
     print("=" * 70)
     
     fold_results = []
+    failed_folds = []
+    converged_folds = []
     
     for i, fold in enumerate(folds):
         print(f"\n[{i+1}/{len(folds)}] Processing {fold.fold_name}...")
@@ -609,6 +575,22 @@ def main():
         )
         
         fold_results.append(result)
+        
+        # Track convergence status
+        if 'error' in result:
+            failed_folds.append(fold.fold_name)
+        elif result.get('diagnostics_summary', {}).get('converged', False):
+            converged_folds.append(fold.fold_name)
+        else:
+            failed_folds.append(fold.fold_name)
+    
+    # Print convergence summary
+    print(f"\n{'='*60}")
+    print(f"CONVERGENCE SUMMARY")
+    print(f"{'='*60}")
+    print(f"Successfully converged: {len(converged_folds)}/{len(folds)}")
+    if failed_folds:
+        print(f"Failed/non-converged folds: {failed_folds}")
     
     # Aggregate results
     print("\n" + "=" * 70)
@@ -631,6 +613,32 @@ def main():
     # Save results
     output_path = v6_root / args.output
     save_results(fold_results, aggregated, output_path, MCMC_CONFIG)
+    
+    # Save detailed diagnostics to separate file
+    diagnostics_path = v6_root / "results/metrics/bayesian_cv_diagnostics.json"
+    diagnostics_data = {
+        'timestamp': datetime.now().isoformat(),
+        'convergence_summary': {
+            'total_folds': len(folds),
+            'converged_folds': len(converged_folds),
+            'failed_folds': len(failed_folds),
+            'converged_fold_names': converged_folds,
+            'failed_fold_names': failed_folds
+        },
+        'fold_diagnostics': [
+            {
+                'fold': r['fold'],
+                'test_year': r['test_year'],
+                'diagnostics': r.get('diagnostics_summary', {}),
+                'full_diagnostics': r.get('diagnostics', {})
+            }
+            for r in fold_results if 'error' not in r
+        ]
+    }
+    diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(diagnostics_path, 'w') as f:
+        json.dump(diagnostics_data, f, indent=2)
+    print(f"\nDiagnostics saved to: {diagnostics_path}")
     
     # Print comparison
     print_comparison_table(aggregated)

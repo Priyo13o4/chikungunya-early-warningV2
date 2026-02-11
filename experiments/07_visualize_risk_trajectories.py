@@ -8,7 +8,7 @@ out-of-sample prediction artifact from Experiment 06:
 It intentionally does NOT refit Bayesian models. Instead it plots:
   - Observed cases
   - District-specific outbreak threshold (cases p{p}) computed from available rows
-  - Bayesian latent risk summary: z_mean with approximate 50%/90% intervals using z_sd
+  - Bayesian forecast latent risk summary: z_mean with approximate 50%/90% intervals using z_sd
 
 Outputs:
   - results/plots/risk_trajectories/*.png
@@ -158,7 +158,7 @@ def plot_risk_trajectory(plot_df: pd.DataFrame, state: str, district: str, perce
         '-',
         color='#1f77b4',
         linewidth=2.5,
-        label='Bayesian Latent Risk (z_mean)',
+        label='Bayesian Forecast Risk (z_mean)',
         zorder=4,
     )
 

@@ -301,6 +301,65 @@ def build_panel(
     total = len(panel)
     print(f"  → {matched}/{total} rows matched ({100*matched/total:.1f}%)")
     
+    # Deduplicate: aggregate duplicate district-week combinations
+    print("\nChecking for duplicate district-week combinations...")
+    dup_check = panel.groupby(['state', 'district', 'year', 'week']).size()
+    n_dups = (dup_check > 1).sum()
+    
+    if n_dups > 0:
+        print(f"  WARNING: Found {n_dups} duplicate district-week combinations")
+        print(f"  Deduplicating by aggregating cases (sum) and climate (mean)...")
+        
+        # Define aggregation rules
+        agg_dict = {}
+        
+        # Cases: sum (combine duplicate reports)
+        if 'cases' in panel.columns:
+            agg_dict['cases'] = 'sum'
+        
+        # Deaths: sum (combine duplicate reports)
+        if 'deaths' in panel.columns:
+            agg_dict['deaths'] = 'sum'
+        
+        # Population: take first (should be constant)
+        if 'population' in panel.columns:
+            agg_dict['population'] = 'first'
+        
+        # Census district: take first
+        if 'census_district' in panel.columns:
+            agg_dict['census_district'] = 'first'
+        
+        # Incidence: will be recalculated
+        if 'incidence_per_100k' in panel.columns:
+            panel = panel.drop(columns=['incidence_per_100k'])
+        
+        # Climate variables: mean (average duplicate measurements)
+        for col in panel.columns:
+            if col.startswith('temp') or col.startswith('rain') or col.startswith('precip') or col.startswith('lai'):
+                agg_dict[col] = 'mean'
+        
+        # Coordinates: mean (should be similar)
+        if 'latitude' in panel.columns:
+            agg_dict['latitude'] = 'mean'
+        if 'longitude' in panel.columns:
+            agg_dict['longitude'] = 'mean'
+        
+        # Group and aggregate
+        panel = panel.groupby(['state', 'district', 'year', 'week'], as_index=False).agg(agg_dict)
+        
+        # Recalculate incidence
+        if 'cases' in panel.columns and 'population' in panel.columns:
+            panel['incidence_per_100k'] = (panel['cases'] / panel['population']) * 100_000
+            panel['incidence_per_100k'] = panel['incidence_per_100k'].round(4)
+            # Handle infinite/NaN incidence (zero population)
+            panel['incidence_per_100k'] = panel['incidence_per_100k'].replace(
+                [np.inf, -np.inf], np.nan
+            )
+        
+        print(f"  ✓ Deduplicated: {len(panel)} unique district-week combinations")
+    else:
+        print(f"  ✓ No duplicates found")
+    
     if output_path:
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)

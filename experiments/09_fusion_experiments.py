@@ -76,17 +76,23 @@ def _normal_cdf(x: np.ndarray) -> np.ndarray:
 
 
 def compute_bayes_prob_high_risk(df: pd.DataFrame, risk_quantile: float = 0.80) -> np.ndarray:
-    """Compute P(Z > q) via Normal(mu=z_mean, sd=z_sd)."""
+    """Compute Bayesian risk scores from forecast predictions.
+    
+    In forecast mode, z_mean IS the forecast (point estimate of latent risk)
+    and z_sd is the forecast uncertainty. We apply sigmoid transformation
+    to convert log-risk to probability [0,1] for fusion compatibility.
+    """
     work = df[['z_mean', 'z_sd']].copy()
     work = work.dropna()
     if work.empty:
         return np.full(shape=(len(df),), fill_value=np.nan, dtype=float)
 
-    q = float(np.percentile(work['z_mean'].astype(float).values, risk_quantile * 100))
+    # Apply sigmoid transformation to convert log-risk to probability [0,1]
+    def _sigmoid(x):
+        return 1.0 / (1.0 + np.exp(-np.clip(x, -20, 20)))
+    
     mu = df['z_mean'].astype(float).values
-    sd = np.maximum(df['z_sd'].astype(float).values, 1e-6)
-    z = (q - mu) / sd
-    return 1.0 - _normal_cdf(z)
+    return _sigmoid(mu)
 
 
 def compute_metrics(y_true: np.ndarray, y_prob: np.ndarray, threshold: float) -> Dict[str, float]:

@@ -47,5 +47,5 @@ All figures include:
 
 ## Generated
 
-Date: 2026-02-08 22:25:17
+Date: 2026-02-11 12:32:11
 Version: v4.2 (Phase 7 Complete)
