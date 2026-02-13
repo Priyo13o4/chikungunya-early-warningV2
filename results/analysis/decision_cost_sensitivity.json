@@ -1,0 +1,94 @@
+{
+  "current": {
+    "total_interventions": 3,
+    "true_positives": 0,
+    "false_positives": 2,
+    "total_outbreaks": 1,
+    "detected": 0,
+    "missed": 1,
+    "sensitivity": 0.0,
+    "precision": 0.0,
+    "false_alarm_rate": 0.6666666666666666,
+    "benefit_component": 0.0,
+    "cost_component": 14.0,
+    "net_benefit": -14.0,
+    "scenario": "current",
+    "cost_structure": {
+      "name": "current",
+      "intervention": 1.0,
+      "false_alarm": 0.5,
+      "missed_outbreak": 10.0,
+      "early_warning_benefit": 5.0,
+      "description": "Current baseline (from config)"
+    }
+  },
+  "conservative": {
+    "total_interventions": 3,
+    "true_positives": 0,
+    "false_positives": 2,
+    "total_outbreaks": 1,
+    "detected": 0,
+    "missed": 1,
+    "sensitivity": 0.0,
+    "precision": 0.0,
+    "false_alarm_rate": 0.6666666666666666,
+    "benefit_component": 0.0,
+    "cost_component": 28.0,
+    "net_benefit": -28.0,
+    "scenario": "conservative",
+    "cost_structure": {
+      "name": "conservative",
+      "intervention": 2.0,
+      "false_alarm": 1.0,
+      "missed_outbreak": 20.0,
+      "early_warning_benefit": 10.0,
+      "description": "2x costs - conservative public health valuation"
+    }
+  },
+  "realistic": {
+    "total_interventions": 3,
+    "true_positives": 0,
+    "false_positives": 2,
+    "total_outbreaks": 1,
+    "detected": 0,
+    "missed": 1,
+    "sensitivity": 0.0,
+    "precision": 0.0,
+    "false_alarm_rate": 0.6666666666666666,
+    "benefit_component": 0.0,
+    "cost_component": 69.0,
+    "net_benefit": -69.0,
+    "scenario": "realistic",
+    "cost_structure": {
+      "name": "realistic",
+      "intervention": 5.0,
+      "false_alarm": 2.0,
+      "missed_outbreak": 50.0,
+      "early_warning_benefit": 25.0,
+      "description": "5x costs - realistic district-level intervention"
+    }
+  },
+  "severe": {
+    "total_interventions": 3,
+    "true_positives": 0,
+    "false_positives": 2,
+    "total_outbreaks": 1,
+    "detected": 0,
+    "missed": 1,
+    "sensitivity": 0.0,
+    "precision": 0.0,
+    "false_alarm_rate": 0.6666666666666666,
+    "benefit_component": 0.0,
+    "cost_component": 140.0,
+    "net_benefit": -140.0,
+    "scenario": "severe",
+    "cost_structure": {
+      "name": "severe",
+      "intervention": 10.0,
+      "false_alarm": 5.0,
+      "missed_outbreak": 100.0,
+      "early_warning_benefit": 50.0,
+      "description": "10x costs - severe outbreak consequences"
+    }
+  }
+}

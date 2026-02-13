@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-11T00:03:09.449220",
+  "timestamp": "2026-02-12T20:58:34.612237",
   "phase": "Phase 7 - Workstream A",
   "version": "v4",
   "config": {
@@ -12,9 +12,9 @@
       2022
     ],
     "lead_time_mode": "fair_quantile",
-    "outbreak_percentile": 75,
-    "bayesian_percentile": 75,
-    "analysis_percentile": 75,
+    "outbreak_percentile": 60,
+    "bayesian_percentile": 60,
+    "analysis_percentile": 60,
     "xgboost_probability_threshold": 0.5,
     "mcmc_config": {
       "n_warmup": 1000,
@@ -24,44 +24,16 @@
       "seed": 42
     }
   },
-  "folds_completed": 5,
+  "folds_completed": 1,
   "folds_failed": 1,
-  "total_episodes": 2,
+  "total_episodes": 1,
   "fold_summary": [
     {
-      "fold": "fold_2018",
-      "test_year": 2018,
-      "n_train": 26,
-      "n_test": 78,
-      "n_episodes": 0
-    },
-    {
-      "fold": "fold_2019",
+      "fold": "fold_2018_2019",
       "test_year": 2019,
-      "n_train": 43,
-      "n_test": 72,
+      "n_train": 22,
+      "n_test": 150,
       "n_episodes": 1
-    },
-    {
-      "fold": "fold_2020",
-      "test_year": 2020,
-      "n_train": 58,
-      "n_test": 20,
-      "n_episodes": 0
-    },
-    {
-      "fold": "fold_2021",
-      "test_year": 2021,
-      "n_train": 67,
-      "n_test": 31,
-      "n_episodes": 1
-    },
-    {
-      "fold": "fold_2022",
-      "test_year": 2022,
-      "n_train": 73,
-      "n_test": 6,
-      "n_episodes": 0
     }
   ]
 }

@@ -377,6 +377,146 @@ def identify_outbreak_episodes(
     return episodes
 
 
+def identify_outbreak_episodes_with_gaps(
+    test_df: pd.DataFrame,
+    outbreak_thresholds: Dict[Tuple[str, str], float],
+    fold_name: str,
+    case_col: str = 'cases',
+    group_cols: List[str] = ['state', 'district'],
+    max_gap_weeks: int = 1,
+    min_episode_length: int = 2
+) -> List[OutbreakEpisode]:
+    """
+    Identify outbreak episodes allowing short NA gaps.
+    
+    Algorithm:
+    ----------
+    1. Mark weeks above threshold as 'outbreak candidates'
+    2. Fill gaps ≤max_gap_weeks ONLY if the gap is due to NA values
+    3. Find consecutive runs after gap-filling
+    4. Filter to episodes with ≥min_episode_length weeks
+    
+    Example:
+    --------
+    Week:     1  2  3  4  5  6  7  8
+    Above:    T  T  NA T  T  F  T  T
+    Filled:   T  T  T  T  T  F  T  T
+                └─episode 1─┘    └ep2┘
+    
+    Result: 2 episodes (bridge week 3 NA, split at week 6)
+    
+    Args:
+        test_df: Test fold DataFrame
+        outbreak_thresholds: Thresholds from training data
+        fold_name: Name of the CV fold
+        case_col: Case count column
+        group_cols: Geographic grouping columns
+        max_gap_weeks: Maximum gap to bridge (default 1)
+        min_episode_length: Minimum weeks for an episode (default 2)
+        
+    Returns:
+        List of OutbreakEpisode objects
+    """
+    episodes = []
+    
+    for (state, district), district_df in test_df.groupby(group_cols):
+        district_key = (state, district)
+        
+        # Skip if no threshold (insufficient training data)
+        if district_key not in outbreak_thresholds:
+            continue
+        
+        threshold = outbreak_thresholds[district_key]
+        
+        # Process each year in the test set
+        for year, year_df in district_df.groupby('year'):
+            year_df = year_df.sort_values('week').reset_index(drop=True)
+            
+            # Mark outbreak candidates (weeks above threshold with non-NA values)
+            outbreak_mask = (year_df[case_col].notna()) & (year_df[case_col] > threshold)
+            
+            # Identify NA weeks
+            na_mask = year_df[case_col].isna()
+            
+            # Fill short NA gaps between outbreak weeks
+            filled_mask = outbreak_mask.copy()
+            
+            for i in range(1, len(filled_mask) - 1):
+                # Check if this is an NA week between outbreak weeks
+                if na_mask.iloc[i]:
+                    # Look back to find last outbreak week
+                    lookback_start = max(0, i - max_gap_weeks)
+                    has_outbreak_before = outbreak_mask.iloc[lookback_start:i].any()
+                    
+                    # Look forward to find next outbreak week
+                    lookforward_end = min(len(filled_mask), i + max_gap_weeks + 1)
+                    has_outbreak_after = outbreak_mask.iloc[i+1:lookforward_end].any()
+                    
+                    # Bridge this NA gap if it's surrounded by outbreak weeks
+                    if has_outbreak_before and has_outbreak_after:
+                        # Verify the gap is not too long
+                        gap_size = i - outbreak_mask.iloc[:i][::-1].idxmax()
+                        if gap_size <= max_gap_weeks:
+                            filled_mask.iloc[i] = True
+            
+            # Find consecutive runs after gap-filling
+            runs = []
+            in_run = False
+            start_idx = None
+            
+            for i in range(len(filled_mask)):
+                if filled_mask.iloc[i]:
+                    if not in_run:
+                        start_idx = i
+                        in_run = True
+                else:
+                    if in_run:
+                        runs.append((start_idx, i - 1))
+                        in_run = False
+            
+            # Close final run if still active
+            if in_run:
+                runs.append((start_idx, len(filled_mask) - 1))
+            
+            # Create episodes from runs that meet minimum length
+            for start_idx, end_idx in runs:
+                # Count actual outbreak weeks (not bridged NA gaps)
+                actual_outbreak_weeks = outbreak_mask.iloc[start_idx:end_idx+1].sum()
+                
+                # Only create episode if it meets minimum length requirement
+                if actual_outbreak_weeks >= min_episode_length:
+                    episode_df = year_df.iloc[start_idx:end_idx+1]
+                    
+                    # Compute statistics over the episode window
+                    first_week = int(episode_df['week'].min())
+                    
+                    # Find peak only among non-NA weeks
+                    valid_cases = episode_df[episode_df[case_col].notna()]
+                    if len(valid_cases) > 0:
+                        peak_idx_local = valid_cases[case_col].idxmax()
+                        peak_week = int(year_df.loc[peak_idx_local, 'week'])
+                        peak_cases = float(year_df.loc[peak_idx_local, case_col])
+                    else:
+                        # Fallback (should not happen)
+                        peak_week = first_week
+                        peak_cases = 0.0
+                    
+                    episode = OutbreakEpisode(
+                        state=state,
+                        district=district,
+                        year=int(year),
+                        fold=fold_name,
+                        first_outbreak_week=first_week,
+                        peak_week=peak_week,
+                        peak_cases=peak_cases,
+                        total_outbreak_weeks=int(actual_outbreak_weeks),
+                        outbreak_threshold=threshold
+                    )
+                    episodes.append(episode)
+    
+    return episodes
+
+
 # =============================================================================
 # TRIGGER IDENTIFICATION
 # =============================================================================
@@ -936,7 +1076,9 @@ class LeadTimeAnalyzer:
         self,
         outbreak_percentile: int,
         bayesian_percentile: int,
-        xgboost_threshold: float
+        xgboost_threshold: float,
+        max_gap_weeks: int = 1,
+        min_episode_length: int = 2
     ):
         """
         Initialize analyzer with threshold parameters.
@@ -945,12 +1087,16 @@ class LeadTimeAnalyzer:
             outbreak_percentile: Percentile for outbreak definition (config-driven)
             bayesian_percentile: Percentile for Bayesian threshold (config-driven)
             xgboost_threshold: XGBoost probability threshold (config-driven)
+            max_gap_weeks: Maximum NA gap to bridge in episode detection (default 1)
+            min_episode_length: Minimum weeks for valid episode (default 2)
         """
         if outbreak_percentile is None or bayesian_percentile is None or xgboost_threshold is None:
             raise ValueError("Threshold parameters must be provided explicitly.")
         self.outbreak_percentile = outbreak_percentile
         self.bayesian_percentile = bayesian_percentile
         self.xgboost_threshold = xgboost_threshold
+        self.max_gap_weeks = max_gap_weeks
+        self.min_episode_length = min_episode_length
         
         # Computed thresholds (populated by compute_thresholds_from_training)
         self.outbreak_thresholds: Dict[Tuple[str, str], float] = {}
@@ -1027,14 +1173,17 @@ class LeadTimeAnalyzer:
         test_year = test_df['year'].iloc[0]
         validate_no_leakage(self.train_years, test_year, self.outbreak_thresholds)
         
-        episodes = identify_outbreak_episodes(
+        # Use new gap-tolerant episode detection
+        episodes = identify_outbreak_episodes_with_gaps(
             test_df,
             self.outbreak_thresholds,
             fold_name,
-            case_col=case_col
+            case_col=case_col,
+            max_gap_weeks=self.max_gap_weeks,
+            min_episode_length=self.min_episode_length
         )
         
-        print(f"  Identified {len(episodes)} outbreak episodes in {fold_name}")
+        print(f"  Identified {len(episodes)} outbreak episodes in {fold_name} (max_gap={self.max_gap_weeks}, min_length={self.min_episode_length})")
         
         return episodes
     

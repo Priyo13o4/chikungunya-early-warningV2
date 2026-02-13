@@ -1,0 +1,5 @@
+Scenario,Interventions,Detection Rate,False Alarm Rate,Net Benefit,Benefits,Costs,ROI Viable
+current,3,0.0%,66.7%,$-14.00,$0.00,$14.00,❌
+conservative,3,0.0%,66.7%,$-28.00,$0.00,$28.00,❌
+realistic,3,0.0%,66.7%,$-69.00,$0.00,$69.00,❌
+severe,3,0.0%,66.7%,$-140.00,$0.00,$140.00,❌

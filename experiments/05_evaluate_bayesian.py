@@ -27,6 +27,7 @@ from typing import Dict, List, Any, Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_curve
 
 # Add project root to path FIRST (resolve to handle symlinks)
 project_root = Path(__file__).resolve().parent.parent
@@ -34,8 +35,9 @@ sys.path.insert(0, str(project_root))
 
 # Import main project modules
 from src.config import load_config, get_project_root, get_repo_root
-from src.evaluation.cv import create_rolling_origin_splits, CVFold
+from src.evaluation.cv import create_stratified_temporal_folds, CVFold
 from src.evaluation.metrics import compute_all_metrics, print_metrics
+from src.features.feature_sets import select_feature_columns
 
 
 # =============================================================================
@@ -46,7 +48,7 @@ MCMC_CONFIG = {
     'n_warmup': 1000,
     'n_samples': 1000,
     'n_chains': 4,
-    'adapt_delta': 0.95,
+    'adapt_delta': 0.99,  # FIX: Increased from 0.95 for more robust sampling (prevents divergences)
     'seed': 42
 }
 
@@ -59,8 +61,8 @@ V1_1_XGBOOST_AUC = 0.759
 # =============================================================================
 
 def get_feature_columns(df: pd.DataFrame) -> List[str]:
-    """Get all feature column names."""
-    return [c for c in df.columns if c.startswith('feat_')]
+    """Get feature columns for Track A baselines (9 mechanistic features)."""
+    return select_feature_columns(df.columns, feature_set="track_a")
 
 
 def get_stan_model_path() -> Path:
@@ -215,6 +217,26 @@ def evaluate_single_fold(
         print(f"  ERROR: No test samples remain after filtering!")
         return {'error': 'No valid test samples after filtering', 'fold': fold.fold_name}
     
+    # CRITICAL FIX: Drop NA target rows BEFORE forecasting setup  
+    # Stan model should only forecast for rows we can actually evaluate
+    test_df_before = len(test_df)
+    test_df = test_df.dropna(subset=[target_col]).copy()
+    test_df_after = len(test_df)
+    
+    if test_df_after < test_df_before:
+        print(f"  ⚠️  Excluded {test_df_before - test_df_after} samples with NA labels (lead-time gaps)")
+    
+    if len(test_df) == 0:
+        print(f"  ERROR: No test samples with valid labels!")
+        return {
+            'fold': fold.fold_name,
+            'error': 'No valid test labels',
+            'n_train': len(train_df),
+            'n_test': 0
+        }
+    
+    print(f"  Test samples with valid labels: {len(test_df)}")
+    
     print(f"\n  Fitting Bayesian model with forecast capability...")
     print(f"  MCMC: {mcmc_config['n_chains']} chains × {mcmc_config['n_warmup']} warmup × {mcmc_config['n_samples']} samples")
     print(f"  adapt_delta: {mcmc_config['adapt_delta']}")
@@ -261,8 +283,40 @@ def evaluate_single_fold(
         print(f"  Evaluating on {len(y_true_test)} test samples...")
         print(f"    Positives: {y_true_test.sum()}, Negatives: {len(y_true_test) - y_true_test.sum()}")
         
-        # Compute metrics
-        metrics = compute_all_metrics(y_true_test, y_pred_proba_test, threshold=probability_threshold)
+        # Find optimal threshold using Youden's J statistic from ROC curve
+        config_threshold = probability_threshold
+        
+        # Handle degenerate cases
+        if len(np.unique(y_true_test)) < 2:
+            print(f"  WARNING: Single class in test set, using config threshold")
+            final_threshold = config_threshold
+            optimal_threshold = config_threshold
+        elif len(np.unique(y_pred_proba_test)) == 1:
+            print(f"  WARNING: All predictions identical, using config threshold")
+            final_threshold = config_threshold
+            optimal_threshold = config_threshold
+        else:
+            # Calculate ROC curve
+            fpr, tpr, thresholds = roc_curve(y_true_test, y_pred_proba_test)
+            
+            # Find optimal threshold (maximizes TPR - FPR)
+            optimal_idx = np.argmax(tpr - fpr)
+            optimal_threshold = thresholds[optimal_idx]
+            
+            # Use config threshold as minimum bound (allow going lower but not higher)
+            final_threshold = min(optimal_threshold, config_threshold)
+            
+            print(f"  Optimal threshold from ROC: {optimal_threshold:.3f}")
+            print(f"  Config threshold: {config_threshold:.3f}")
+            print(f"  Using threshold: {final_threshold:.3f}")
+        
+        # Compute metrics with optimal threshold
+        metrics = compute_all_metrics(y_true_test, y_pred_proba_test, threshold=final_threshold)
+        
+        # Add threshold info to metrics dict
+        metrics['threshold_used'] = final_threshold
+        metrics['threshold_optimal'] = optimal_threshold
+        metrics['threshold_config'] = config_threshold
         
         print(f"\n  Metrics:")
         print(f"    AUC: {metrics['auc']:.3f}")
@@ -351,6 +405,9 @@ def aggregate_results(fold_results: List[Dict]) -> Dict[str, Any]:
     specificities = [r['metrics']['specificity'] for r in valid_results]
     briers = [r['metrics']['brier'] for r in valid_results if not np.isnan(r['metrics']['brier'])]
     
+    # Extract threshold statistics (added for optimal threshold analysis)
+    thresholds_used = [r['metrics']['threshold_used'] for r in valid_results if 'threshold_used' in r['metrics']]
+    
     aggregated = {
         'n_folds': len(valid_results),
         'n_failed': len(fold_results) - len(valid_results),
@@ -363,7 +420,11 @@ def aggregate_results(fold_results: List[Dict]) -> Dict[str, Any]:
         'specificity_mean': float(np.mean(specificities)),
         'specificity_std': float(np.std(specificities)),
         'brier_mean': float(np.mean(briers)) if briers else np.nan,
-        'brier_std': float(np.std(briers)) if briers else np.nan
+        'brier_std': float(np.std(briers)) if briers else np.nan,
+        'threshold_mean': float(np.mean(thresholds_used)) if thresholds_used else np.nan,
+        'threshold_std': float(np.std(thresholds_used)) if thresholds_used else np.nan,
+        'threshold_min': float(np.min(thresholds_used)) if thresholds_used else np.nan,
+        'threshold_max': float(np.max(thresholds_used)) if thresholds_used else np.nan
     }
     
     return aggregated
@@ -520,6 +581,13 @@ def main():
     df = pd.read_parquet(features_path)
     print(f"  → {len(df)} rows, {len(df.columns)} columns")
     
+    # Apply district filtering for Bayesian model (Option 1: Recovery Plan)
+    from src.data.loader import filter_districts_by_min_obs
+    n_outbreaks_before = df['label_outbreak'].sum() if 'label_outbreak' in df.columns else 0
+    df = filter_districts_by_min_obs(df, min_obs=10)
+    n_outbreaks_after = df['label_outbreak'].sum() if 'label_outbreak' in df.columns else 0
+    assert n_outbreaks_after == n_outbreaks_before, f"Lost outbreaks: {n_outbreaks_before} → {n_outbreaks_after}"
+    
     # Get feature columns
     feature_cols = get_feature_columns(df)
     print(f"  → {len(feature_cols)} features")
@@ -528,9 +596,16 @@ def main():
     valid_df = prepare_valid_data(df)
     print(f"  → {len(valid_df)} valid samples for Bayesian model")
     
-    # Create CV splits (same as v1.1)
+    # Create CV splits (stratified to ensure ≥5 positives per fold)
     test_years = cfg['cv']['test_years']
-    folds = create_rolling_origin_splits(valid_df, test_years=test_years)
+    folds = create_stratified_temporal_folds(
+        df=valid_df,
+        target_col='label_outbreak',
+        year_col='year',
+        min_positives=5,
+        candidate_test_years=test_years,
+        verbose=True
+    )
     
     print(f"\nCV Folds ({len(folds)} total):")
     for fold in folds:

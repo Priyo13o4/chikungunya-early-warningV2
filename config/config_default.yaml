@@ -56,14 +56,21 @@ feature_engineering:
 # =============================================================================
 labels:
   # CRITICAL: This percentile MUST match evaluation in src/evaluation/lead_time.py
-  # Currently aligned at p75 for both training labels and outbreak detection
-  # CRITICAL: This percentile controls THREE components:
+  # Currently aligned at p60 for both training labels and outbreak detection
+  # CRITICAL: This percentile controls TWO components:
   # 1. Label creation threshold (what constitutes an "outbreak" to predict)
   # 2. Outbreak detection threshold (ground truth definition for evaluation)
-  # 3. Bayesian trigger threshold (when model should issue warnings)
-  # TODO: Consider splitting into separate parameters for independent tuning
-  outbreak_percentile: 75       # p75 threshold for "elevated transmission risk"
+  # Changed from 75→60 to capture more outbreak signals (Phase 7 threshold alignment)
+  outbreak_percentile: 60       # p60 threshold for "elevated transmission risk"
   horizon: 3                    # Predict outbreak in next H weeks
+
+# =============================================================================
+# DECISION LAYER
+# =============================================================================
+decision:
+  # Risk quantile for intervention threshold (when to issue warnings)
+  # Changed from 80→70→60 to match P60 labeling threshold (Phase 2-5 alignment)
+  risk_quantile: 0.60           # p60 threshold for action/intervention
 
 # =============================================================================
 # CROSS-VALIDATION

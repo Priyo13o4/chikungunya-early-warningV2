@@ -369,6 +369,43 @@ def build_panel(
     return panel
 
 
+def filter_districts_by_min_obs(df: pd.DataFrame, min_obs: int = 10) -> pd.DataFrame:
+    """
+    Filter to districts with at least min_obs observations.
+    
+    Args:
+        df: DataFrame with 'state' and 'district' columns
+        min_obs: Minimum number of observations per district (default: 10)
+    
+    Returns:
+        Filtered DataFrame containing only districts meeting threshold
+    """
+    # Count observations per district
+    district_counts = df.groupby(['state', 'district']).size()
+    
+    # Get districts meeting threshold
+    valid_districts = district_counts[district_counts >= min_obs].index
+    
+    # Filter dataframe
+    df_filtered = df.set_index(['state', 'district']).loc[valid_districts].reset_index()
+    
+    # Log filtering results
+    n_districts_before = len(df.groupby(['state', 'district']))
+    n_districts_after = len(valid_districts)
+    n_obs_before = len(df)
+    n_obs_after = len(df_filtered)
+    n_outbreaks_before = df['label_outbreak'].sum() if 'label_outbreak' in df.columns else 0
+    n_outbreaks_after = df_filtered['label_outbreak'].sum() if 'label_outbreak' in df_filtered.columns else 0
+    
+    print(f"District filtering (≥{min_obs} obs):")
+    print(f"  Districts: {n_districts_before} → {n_districts_after} ({n_districts_after/n_districts_before*100:.1f}% retained)")
+    print(f"  Samples: {n_obs_before} → {n_obs_after} ({n_obs_after/n_obs_before*100:.1f}% retained)")
+    if 'label_outbreak' in df.columns:
+        print(f"  Labeled outbreaks: {int(n_outbreaks_before)} → {int(n_outbreaks_after)} ({n_outbreaks_after/n_outbreaks_before*100:.1f}% retained)")
+    
+    return df_filtered
+
+
 if __name__ == "__main__":
     # Quick test
     from src.config import get_project_root

@@ -1,0 +1,2 @@
+state,district,year,fold,first_outbreak_week,peak_week,peak_cases,total_outbreak_weeks,outbreak_threshold,bayesian_trigger_week,xgboost_trigger_week,lead_time_bayesian,lead_time_xgboost,differential_lead,bayesian_threshold,xgboost_threshold
+Karnataka,Tumkur,2019,fold_2018_2019,5,5,4.2791,2,1.2181,,,-1,-1,,3.342312541404,0.48893672227859497

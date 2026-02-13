@@ -25,12 +25,13 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.config import load_config, get_project_root, get_repo_root
-from src.evaluation.cv import create_rolling_origin_splits
+from src.evaluation.cv import create_stratified_temporal_folds
+from src.features.feature_sets import select_feature_columns
 
 
 def get_feature_columns(df: pd.DataFrame) -> list:
-    """Get all feature column names."""
-    return [c for c in df.columns if c.startswith('feat_')]
+    """Get feature columns for Track A baselines (9 mechanistic features)."""
+    return select_feature_columns(df.columns, feature_set="track_a")
 
 
 def main():
@@ -86,6 +87,13 @@ def main():
     df = pd.read_parquet(features_path)
     print(f"  → {len(df)} rows, {len(df.columns)} columns")
     
+    # Apply district filtering for Bayesian model (Option 1: Recovery Plan)
+    from src.data.loader import filter_districts_by_min_obs
+    n_outbreaks_before = df['label_outbreak'].sum() if 'label_outbreak' in df.columns else 0
+    df = filter_districts_by_min_obs(df, min_obs=10)
+    n_outbreaks_after = df['label_outbreak'].sum() if 'label_outbreak' in df.columns else 0
+    assert n_outbreaks_after == n_outbreaks_before, f"Lost outbreaks: {n_outbreaks_before} → {n_outbreaks_after}"
+    
     # Get feature columns
     feature_cols = get_feature_columns(df)
     print(f"  → {len(feature_cols)} features")
@@ -101,14 +109,22 @@ def main():
     
     print(f"  → {len(valid_df)} valid samples for Bayesian model")
     
-    # Create CV splits (same as baselines)
+    # Create stratified CV splits
     test_years = cfg['cv']['test_years']
-    folds = create_rolling_origin_splits(valid_df, test_years=test_years)
+    folds = create_stratified_temporal_folds(
+        df=valid_df,
+        target_col='label_outbreak',
+        year_col='year',
+        min_positives=5,
+        candidate_test_years=test_years,
+        verbose=False
+    )
     
-    print(f"\nCV Folds available: {len(folds)}")
+    print(f"\nCV Folds available: {len(folds)} (stratified)")
     for fold in folds:
         marker = " ← TARGET" if fold.fold_name == args.fold else ""
-        print(f"  {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}{marker}")
+        test_years_str = "-".join(map(str, fold.test_years))
+        print(f"  {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}, test_years={test_years_str}{marker}")
     
     # Find target fold
     target_fold = None

@@ -17,12 +17,16 @@ data {
   array[N] int<lower=1, upper=T_max> time;  // Time index for each obs
   array[N] int<lower=0> y;                  // Observed cases (counts)
   array[N] real temp_anomaly;               // Temperature anomaly (lagged)
+  array[N] real degree_days;                // Degree-days above 20C threshold
+  array[N] real rain_persist;               // 4-week rainfall persistence
   
   // Forecast inputs (for temporal prediction beyond training period)
   int<lower=0> N_forecast;               // Number of forecast observations
   array[N_forecast] int<lower=1, upper=D> district_forecast;
   array[N_forecast] int<lower=T_max+1> time_forecast;
   array[N_forecast] real temp_anomaly_forecast;
+  array[N_forecast] real degree_days_forecast;
+  array[N_forecast] real rain_persist_forecast;
 }
 
 parameters {
@@ -34,8 +38,10 @@ parameters {
   // AR(1) coefficient
   real<lower=0, upper=0.99> rho;     // Persistence of risk
   
-  // Climate effect
+  // Climate effects
   real beta_temp;                    // Temperature coefficient
+  real beta_degreedays;              // Degree-days effect on transmission
+  real beta_rain;                    // Rainfall persistence effect
   
   // Process noise
   real<lower=0, upper=5> sigma;      // Innovation SD
@@ -51,8 +57,9 @@ transformed parameters {
   // Non-centered district intercepts
   vector[D] alpha = mu_alpha + sigma_alpha * alpha_raw;
 
-  // NegBin dispersion (softplus for stability)
-  real phi = log1p_exp(phi_raw);
+  // NegBin dispersion (softplus for stability, clamped to prevent gamma overflow)
+  // Minimum phi = 0.1 prevents extreme overdispersion that causes neg_binomial_2_log_rng to overflow
+  real phi = fmax(log1p_exp(phi_raw), 0.1);
   
   // Latent log-risk states
   matrix[D, T_max] Z;
@@ -81,8 +88,10 @@ model {
   // AR coefficient (expect persistence)
   rho ~ normal(0.7, 0.15);
   
-  // Climate effect (weakly informative)
+  // Climate effects (weakly informative)
   beta_temp ~ normal(0, 0.5);
+  beta_degreedays ~ normal(0, 0.1);  // FIX: Tighter prior to prevent overflow (was 0.5)
+  beta_rain ~ normal(0, 0.5);        // Prior: moderate precipitation effect
   
   // Process noise
   sigma ~ normal(0, 0.5);            // Half-normal
@@ -101,8 +110,11 @@ model {
     int d = district[n];
     int t = time[n];
     
-    // Expected log-rate includes climate effect
-    real log_mu = Z[d, t] + beta_temp * temp_anomaly[n];
+    // Expected log-rate includes climate effects
+    real log_mu = Z[d, t] 
+                  + beta_temp * temp_anomaly[n]
+                  + beta_degreedays * degree_days[n]
+                  + beta_rain * rain_persist[n];
     
     // Negative Binomial likelihood
     // Using mean-dispersion parameterization
@@ -129,7 +141,15 @@ generated quantities {
   for (n in 1:N) {
     int d = district[n];
     int t = time[n];
-    real log_mu = Z[d, t] + beta_temp * temp_anomaly[n];
+    real log_mu_unclamped = Z[d, t] 
+                            + beta_temp * temp_anomaly[n]
+                            + beta_degreedays * degree_days[n]
+                            + beta_rain * rain_persist[n];
+    
+    // Clamp more aggressively to prevent gamma overflow in neg_binomial_2_log_rng
+    // exp(10) ≈ 22,026 cases (extreme but plausible outbreak)
+    // exp(-10) ≈ 0.00005 (essentially zero)
+    real log_mu = fmin(fmax(log_mu_unclamped, -10.0), 10.0);
     
     // Posterior predictive
     y_rep[n] = neg_binomial_2_log_rng(log_mu, phi);
@@ -159,7 +179,16 @@ generated quantities {
       int d = district_forecast[n];
       int t = time_forecast[n];
       int t_idx = t - T_max;
-      real log_mu = Z_forecast[d, t_idx] + beta_temp * temp_anomaly_forecast[n];
+      real log_mu_unclamped = Z_forecast[d, t_idx]
+                              + beta_temp * temp_anomaly_forecast[n]
+                              + beta_degreedays * degree_days_forecast[n]
+                              + beta_rain * rain_persist_forecast[n];
+      
+      // CRITICAL FIX: More aggressive clamping for forecast to prevent overflow
+      // exp(10) ≈ 22,026 cases (upper bound for extreme outbreak)
+      // exp(-5) ≈ 0.007 (lower bound, essentially zero cases)
+      // This prevents gamma distribution overflow in neg_binomial_2_log_rng
+      real log_mu = fmin(fmax(log_mu_unclamped, -5.0), 10.0);
       
       y_forecast[n] = neg_binomial_2_log_rng(log_mu, phi);
       log_lik_forecast[n] = neg_binomial_2_log_lpmf(y_forecast[n] | log_mu, phi);

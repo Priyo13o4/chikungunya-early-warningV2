@@ -1,6 +1,0 @@
-fold,test_year,n_episodes,bayesian_n_warned,bayesian_median_lead,bayesian_mean_lead,bayesian_iqr_lower,bayesian_iqr_upper,bayesian_pct_early,bayesian_pct_never,xgboost_n_warned,xgboost_median_lead,xgboost_mean_lead,xgboost_iqr_lower,xgboost_iqr_upper,xgboost_pct_early,xgboost_pct_never
-fold_2018,2018,0,0,,,,,0.0,100.0,0,,,,,0.0,100.0
-fold_2019,2019,1,0,,,,,0.0,100.0,0,,,,,0.0,100.0
-fold_2020,2020,0,0,,,,,0.0,100.0,0,,,,,0.0,100.0
-fold_2021,2021,1,0,,,,,0.0,100.0,0,,,,,0.0,100.0
-fold_2022,2022,0,0,,,,,0.0,100.0,0,,,,,0.0,100.0

@@ -2,6 +2,7 @@
 
 from src.evaluation.cv import (
     create_rolling_origin_splits,
+    create_stratified_temporal_folds,
     CVFold,
     cv_split_generator,
     prepare_train_test,
@@ -33,6 +34,7 @@ from src.evaluation.lead_time import (
 __all__ = [
     # CV module
     'create_rolling_origin_splits',
+    'create_stratified_temporal_folds',
     'CVFold',
     'cv_split_generator',
     'prepare_train_test',

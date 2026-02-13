@@ -68,7 +68,7 @@ sys.path.insert(0, str(project_root))
 
 # Import project modules
 from src.config import load_config, get_project_root, get_repo_root
-from src.evaluation.cv import create_rolling_origin_splits, CVFold
+from src.evaluation.cv import create_stratified_temporal_folds, CVFold
 from src.evaluation.lead_time import (
     LeadTimeAnalyzer,
     LeadTimeResult,
@@ -678,6 +678,8 @@ def analyze_single_fold(
         outbreak_percentile=int(outbreak_percentile),
         bayesian_percentile=int(bayesian_percentile),
         xgboost_threshold=float(xgboost_probability_threshold),
+        max_gap_weeks=1,  # Allow 1-week NA gaps in episode detection
+        min_episode_length=2  # Require at least 2 weeks for valid episode
     )
     
     # Compute outbreak thresholds from TRAINING data only
@@ -1015,7 +1017,12 @@ def main():
         raise ValueError("Missing labels.outbreak_percentile in config and no --outbreak-percentile override.")
     outbreak_percentile = int(args.outbreak_percentile if args.outbreak_percentile is not None else cfg_outbreak)
 
-    bayesian_percentile = int(args.bayesian_percentile or outbreak_percentile)
+    # Use decision.risk_quantile if available, otherwise fall back to bayesian_percentile or outbreak_percentile
+    cfg_risk_quantile = config.get('decision', {}).get('risk_quantile')
+    if cfg_risk_quantile is not None:
+        bayesian_percentile = int(cfg_risk_quantile * 100)  # Convert 0.70 -> 70
+    else:
+        bayesian_percentile = int(args.bayesian_percentile or outbreak_percentile)
 
     cfg_prob_threshold = config.get('evaluation', {}).get('probability_threshold')
     if cfg_prob_threshold is None:
@@ -1055,16 +1062,20 @@ def main():
     # Imputation is handled fold-by-fold inside analyze_single_fold.
     
     # =========================================================================
-    # CREATE CV FOLDS
+    # CREATE CV FOLDS (STRATIFIED)
     # =========================================================================
     print("\n" + "-"*70)
-    print("STEP 2: Creating CV Folds")
+    print("STEP 2: Creating Stratified CV Folds")
     print("-"*70)
     
-    folds = create_rolling_origin_splits(df, test_years=test_years)
-    print(f"  Created {len(folds)} folds:")
-    for fold in folds:
-        print(f"    {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}")
+    folds = create_stratified_temporal_folds(
+        df=df,
+        target_col='label_outbreak',
+        year_col='year',
+        min_positives=5,
+        candidate_test_years=test_years,
+        verbose=True
+    )
     
     # =========================================================================
     # ANALYZE EACH FOLD

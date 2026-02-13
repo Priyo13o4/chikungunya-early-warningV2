@@ -40,6 +40,47 @@ from src.config import load_config
 
 
 # =============================================================================
+# COST SCENARIOS FOR SENSITIVITY ANALYSIS
+# =============================================================================
+
+# Cost scenarios to test (C_intervention, C_false_alarm, C_missed_outbreak)
+COST_SCENARIOS = [
+    {
+        'name': 'current',
+        'intervention': 1.0,
+        'false_alarm': 0.5,
+        'missed_outbreak': 10.0,
+        'early_warning_benefit': 5.0,
+        'description': 'Current baseline (from config)'
+    },
+    {
+        'name': 'conservative',
+        'intervention': 2.0,
+        'false_alarm': 1.0,
+        'missed_outbreak': 20.0,
+        'early_warning_benefit': 10.0,
+        'description': '2x costs - conservative public health valuation'
+    },
+    {
+        'name': 'realistic',
+        'intervention': 5.0,
+        'false_alarm': 2.0,
+        'missed_outbreak': 50.0,
+        'early_warning_benefit': 25.0,
+        'description': '5x costs - realistic district-level intervention'
+    },
+    {
+        'name': 'severe',
+        'intervention': 10.0,
+        'false_alarm': 5.0,
+        'missed_outbreak': 100.0,
+        'early_warning_benefit': 50.0,
+        'description': '10x costs - severe outbreak consequences'
+    }
+]
+
+
+# =============================================================================
 # DECISION FRAMEWORK
 # =============================================================================
 
@@ -53,7 +94,7 @@ class AlertZone(Enum):
 @dataclass
 class DecisionThresholds:
     """Thresholds for decision zones."""
-    risk_quantile: float = 0.80  # 80th percentile threshold for P(Z_t > q)
+    risk_quantile: float = 0.60  # 60th percentile threshold for P(Z_t > q)
     prob_low: float = 0.40       # P(Z_t > q) < 0.4 → GREEN
     prob_high: float = 0.80      # P(Z_t > q) ≥ 0.8 → RED (if low uncertainty)
     uncertainty_threshold: float = 0.5  # Coefficient of variation threshold
@@ -312,33 +353,38 @@ def simulate_decision_layer_for_fold(
     fold_name: str,
     thresholds: DecisionThresholds,
     costs: DecisionCosts,
+    verbose: bool = True
 ) -> Dict[str, Any]:
     """Simulate decision layer for one fold using stored predictions."""
-    print(f"\n{'='*60}")
-    print(f"Simulating fold: {fold_name}")
-    print(f"{'='*60}")
+    if verbose:
+        print(f"\n{'='*60}")
+        print(f"Simulating fold: {fold_name}")
+        print(f"{'='*60}")
 
-    print("\nStep 1: Computing Bayesian risk scores from stored latent Z...")
+    if verbose:
+        print("\nStep 1: Computing Bayesian risk scores from stored latent Z...")
     risk_df = compute_bayesian_risk_scores(fold_df, thresholds)
 
-    print("\nStep 2: Evaluating decision performance...")
+    if verbose:
+        print("\nStep 2: Evaluating decision performance...")
     results = evaluate_decision_performance(risk_df, thresholds, costs)
     
     # Print summary
-    print("\n--- Decision Layer Results ---")
-    print(f"Total interventions (RED): {results['interventions']['total']}")
-    print(f"  True positives: {results['interventions']['true_positive']}")
-    print(f"  False positives: {results['interventions']['false_positive']}")
-    print(f"Total outbreaks: {results['outbreaks']['total']}")
-    print(f"  Detected: {results['outbreaks']['detected']}")
-    print(f"  Missed: {results['outbreaks']['missed']}")
-    
-    if results['metrics']['median_lead_time'] is not None:
-        print(f"Median lead time: {results['metrics']['median_lead_time']:.1f} weeks")
-    print(f"Sensitivity: {results['metrics']['sensitivity']:.3f}")
-    print(f"Precision: {results['metrics']['precision']:.3f}")
-    print(f"False alarm rate: {results['metrics']['false_alarm_rate']:.3f}")
-    print(f"\nNet benefit: {results['cost_analysis']['net_benefit']:.2f}")
+    if verbose:
+        print("\n--- Decision Layer Results ---")
+        print(f"Total interventions (RED): {results['interventions']['total']}")
+        print(f"  True positives: {results['interventions']['true_positive']}")
+        print(f"  False positives: {results['interventions']['false_positive']}")
+        print(f"Total outbreaks: {results['outbreaks']['total']}")
+        print(f"  Detected: {results['outbreaks']['detected']}")
+        print(f"  Missed: {results['outbreaks']['missed']}")
+        
+        if results['metrics']['median_lead_time'] is not None:
+            print(f"Median lead time: {results['metrics']['median_lead_time']:.1f} weeks")
+        print(f"Sensitivity: {results['metrics']['sensitivity']:.3f}")
+        print(f"Precision: {results['metrics']['precision']:.3f}")
+        print(f"False alarm rate: {results['metrics']['false_alarm_rate']:.3f}")
+        print(f"\nNet benefit: {results['cost_analysis']['net_benefit']:.2f}")
     
     return {
         'fold': fold_name,
@@ -353,6 +399,209 @@ def simulate_decision_layer_for_fold(
 
 
 # =============================================================================
+# COST SENSITIVITY ANALYSIS
+# =============================================================================
+
+def aggregate_fold_results(fold_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Aggregate results across folds."""
+    total_interventions = sum([r['total_interventions'] for r in fold_results])
+    total_tp = sum([r['true_positives'] for r in fold_results])
+    total_fp = sum([r['false_positives'] for r in fold_results])
+    total_outbreaks = sum([r['total_outbreaks'] for r in fold_results])
+    total_detected = sum([r['detected'] for r in fold_results])
+    total_missed = sum([r['missed'] for r in fold_results])
+    
+    all_lead_times = []
+    for r in fold_results:
+        all_lead_times.extend(r['lead_times'])
+    
+    # Aggregate cost/benefit
+    total_benefit = sum([r['benefit_component'] for r in fold_results])
+    total_cost = sum([r['cost_component'] for r in fold_results])
+    
+    aggregated = {
+        'total_interventions': total_interventions,
+        'true_positives': total_tp,
+        'false_positives': total_fp,
+        'total_outbreaks': total_outbreaks,
+        'detected': total_detected,
+        'missed': total_missed,
+        'sensitivity': total_detected / total_outbreaks if total_outbreaks > 0 else 0,
+        'precision': total_tp / total_interventions if total_interventions > 0 else 0,
+        'false_alarm_rate': total_fp / total_interventions if total_interventions > 0 else 0,
+        'benefit_component': total_benefit,
+        'cost_component': total_cost,
+        'net_benefit': total_benefit - total_cost
+    }
+    
+    if len(all_lead_times) > 0:
+        aggregated['median_lead_time'] = float(np.median(all_lead_times))
+        aggregated['mean_lead_time'] = float(np.mean(all_lead_times))
+        aggregated['std_lead_time'] = float(np.std(all_lead_times))
+    
+    return aggregated
+
+
+def generate_cost_sensitivity_table(results_by_scenario: Dict[str, Dict[str, Any]]):
+    """
+    Create comparison table across cost scenarios.
+    """
+    table_data = []
+    
+    for scenario_name, results in results_by_scenario.items():
+        table_data.append({
+            'Scenario': scenario_name,
+            'Interventions': results['total_interventions'],
+            'Detection Rate': f"{results['sensitivity']:.1%}",
+            'False Alarm Rate': f"{results.get('false_alarm_rate', 0):.1%}",
+            'Net Benefit': f"${results['net_benefit']:.2f}",
+            'Benefits': f"${results['benefit_component']:.2f}",
+            'Costs': f"${results['cost_component']:.2f}",
+            'ROI Viable': '✅' if results['net_benefit'] >= 0 else '❌'
+        })
+    
+    df = pd.DataFrame(table_data)
+    
+    print("\n" + "="*80)
+    print("COST SENSITIVITY ANALYSIS SUMMARY")
+    print("="*80)
+    print(df.to_string(index=False))
+    
+    # Save to CSV
+    csv_path = project_root / "results" / "analysis" / "decision_cost_sensitivity_table.csv"
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(csv_path, index=False)
+    print(f"\n✓ Table saved to: {csv_path}")
+
+
+def run_cost_sensitivity_analysis(predictions_df: pd.DataFrame, config: dict):
+    """Run multi-scenario cost sensitivity analysis."""
+    # Load thresholds from config
+    thresholds = DecisionThresholds()
+    
+    print("\n" + "="*80)
+    print("COST SENSITIVITY ANALYSIS")
+    print("="*80)
+    print(f"\nRunning decision simulation across {len(COST_SCENARIOS)} cost scenarios...")
+    
+    # Run analysis for each cost scenario
+    results_by_scenario = {}
+    
+    for scenario in COST_SCENARIOS:
+        print(f"\n{'='*60}")
+        print(f"SCENARIO: {scenario['name'].upper()}")
+        print(f"{scenario['description']}")
+        print(f"{'='*60}")
+        print(f"  Intervention cost: ${scenario['intervention']:.2f}")
+        print(f"  False alarm cost: ${scenario['false_alarm']:.2f}")
+        print(f"  Missed outbreak loss: ${scenario['missed_outbreak']:.2f}")
+        print(f"  Early warning benefit: ${scenario['early_warning_benefit']:.2f}")
+        
+        # Simulate per fold
+        fold_results = []
+        for fold_name in predictions_df['fold'].unique():
+            fold_df = predictions_df[predictions_df['fold'] == fold_name]
+            
+            result = simulate_decision_layer_with_costs(
+                predictions_df=fold_df,
+                thresholds=thresholds,
+                cost_intervention=scenario['intervention'],
+                cost_false_alarm=scenario['false_alarm'],
+                cost_missed_outbreak=scenario['missed_outbreak'],
+                benefit_early_warning=scenario['early_warning_benefit']
+            )
+            result['fold'] = fold_name
+            result['scenario'] = scenario['name']
+            fold_results.append(result)
+        
+        # Aggregate across folds
+        aggregated = aggregate_fold_results(fold_results)
+        aggregated['scenario'] = scenario['name']
+        aggregated['cost_structure'] = scenario
+        
+        results_by_scenario[scenario['name']] = aggregated
+        
+        # Print summary
+        print(f"\nAggregated Results:")
+        print(f"  Total interventions: {aggregated['total_interventions']}")
+        print(f"  Detection rate: {aggregated['sensitivity']:.1%}")
+        print(f"  Net benefit: ${aggregated['net_benefit']:.2f}")
+        print(f"    Benefits: ${aggregated['benefit_component']:.2f}")
+        print(f"    Costs: ${aggregated['cost_component']:.2f}")
+    
+    # Save results
+    output_path = project_root / "results" / "analysis" / "decision_cost_sensitivity.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(_json_safe(results_by_scenario), f, indent=2)
+    
+    print(f"\n✓ Results saved to: {output_path}")
+    
+    # Generate comparison table
+    generate_cost_sensitivity_table(results_by_scenario)
+    
+    return results_by_scenario
+
+
+def simulate_decision_layer_with_costs(
+    predictions_df: pd.DataFrame,
+    thresholds: DecisionThresholds,
+    cost_intervention: float,
+    cost_false_alarm: float,
+    cost_missed_outbreak: float,
+    benefit_early_warning: float
+) -> Dict[str, Any]:
+    """
+    Simulate decision layer with specified cost structure.
+    
+    Returns:
+        dict with keys:
+        - total_interventions
+        - true_positives
+        - false_positives
+        - total_outbreaks
+        - detected_outbreaks
+        - missed_outbreaks
+        - net_benefit
+        - sensitivity
+        - precision
+        - false_alarm_rate
+    """
+    # Create costs object
+    costs = DecisionCosts(
+        cost_intervention=cost_intervention,
+        cost_false_alarm=cost_false_alarm,
+        loss_missed_outbreak=cost_missed_outbreak,
+        benefit_early_warning=benefit_early_warning
+    )
+    
+    # Compute risk scores and evaluate
+    risk_df = compute_bayesian_risk_scores(predictions_df, thresholds)
+    results = evaluate_decision_performance(risk_df, thresholds, costs)
+    
+    # Extract key metrics
+    return {
+        'total_interventions': results['interventions']['total'],
+        'true_positives': results['interventions']['true_positive'],
+        'false_positives': results['interventions']['false_positive'],
+        'total_outbreaks': results['outbreaks']['total'],
+        'detected': results['outbreaks']['detected'],
+        'missed': results['outbreaks']['missed'],
+        'sensitivity': results['metrics']['sensitivity'],
+        'precision': results['metrics']['precision'],
+        'false_alarm_rate': results['metrics']['false_alarm_rate'],
+        'net_benefit': results['cost_analysis']['net_benefit'],
+        'benefit_component': results['cost_analysis']['early_warning_benefit'],
+        'cost_component': (
+            results['cost_analysis']['intervention_cost'] +
+            results['cost_analysis']['false_alarm_cost'] +
+            results['cost_analysis']['missed_outbreak_loss']
+        ),
+        'lead_times': results['lead_times']
+    }
+
+
+# =============================================================================
 # MAIN SIMULATION
 # =============================================================================
 
@@ -360,10 +609,12 @@ def main():
     parser = argparse.ArgumentParser(description='Phase 6 Task 3: Decision-Layer Simulation')
     parser.add_argument('--config', type=str, default='config/config_default.yaml',
                        help='Path to config file')
-    parser.add_argument('--outbreak-percentile', type=int, default=75,
+    parser.add_argument('--outbreak-percentile', type=int, default=60,
                        help='Outbreak percentile used in Experiment 06 outputs (selects lead_time_predictions_p{p}.parquet)')
     parser.add_argument('--output', type=str, default=None,
                        help='Output JSON file')
+    parser.add_argument('--cost-sensitivity', action='store_true',
+                       help='Run cost sensitivity analysis across multiple scenarios')
     args = parser.parse_args()
     
     # Load configuration
@@ -376,6 +627,11 @@ def main():
     print("Loading stored predictions from Experiment 06...")
     preds = load_predictions(args.outbreak_percentile)
     print(f"Loaded {len(preds)} prediction rows across folds")
+
+    # Check if cost sensitivity analysis is requested
+    if args.cost_sensitivity:
+        run_cost_sensitivity_analysis(preds, config)
+        return
 
     # Simulate each fold (preds are already per-fold test sets)
     all_results = []

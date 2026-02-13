@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-02-12T20:58:57.065220",
+  "phase": "Experiment 09 - Fusion Experiments (prediction-level)",
+  "input": {
+    "predictions_parquet": "/Volumes/My Drive/Priyodip/college notes and stuff/sem6/research work/implemnetation/chikungunya-early-warningV2/results/analysis/lead_time_predictions_p60.parquet",
+    "probability_threshold": 0.5
+  },
+  "strategies": {
+    "gated_decision": "Use Bayesian P(Z>q) when high risk, else XGBoost",
+    "weighted_ensemble": "Weighted combination of probabilities"
+  },
+  "aggregated": {
+    "gated_decision": {
+      "auc_mean": 0.6111111111111112,
+      "auc_std": 0.0,
+      "aupr_mean": 0.5,
+      "aupr_std": 0.0,
+      "precision_mean": 0.4,
+      "precision_std": 0.0,
+      "recall_mean": 0.3333333333333333,
+      "recall_std": 0.0,
+      "f1_mean": 0.36363636363636365,
+      "f1_std": 0.0,
+      "kappa_mean": 0.17647058823529416,
+      "kappa_std": 0.0,
+      "brier_mean": 0.3061169918201809,
+      "brier_std": 0.0,
+      "n_valid_folds": 1
+    },
+    "weighted_ensemble": {
+      "auc_mean": 0.5,
+      "auc_std": 0.0,
+      "aupr_mean": 0.25,
+      "aupr_std": 0.0,
+      "precision_mean": 0.0,
+      "precision_std": 0.0,
+      "recall_mean": 0.0,
+      "recall_std": 0.0,
+      "f1_mean": 0.0,
+      "f1_std": 0.0,
+      "kappa_mean": 0.0,
+      "kappa_std": 0.0,
+      "brier_mean": 0.24459075725323842,
+      "brier_std": 0.0,
+      "n_valid_folds": 1
+    }
+  },
+  "fold_results": [
+    {
+      "fold": "fold_2018_2019",
+      "n_rows": 150,
+      "strategies": {
+        "gated_decision": {
+          "strategy": "gated_decision",
+          "gate_threshold": 0.8,
+          "risk_quantile": 0.8,
+          "bayes_usage_rate": 0.20833333333333334,
+          "metrics": {
+            "auc": 0.6111111111111112,
+            "aupr": 0.5,
+            "precision": 0.4,
+            "recall": 0.3333333333333333,
+            "f1": 0.36363636363636365,
+            "kappa": 0.17647058823529416,
+            "brier": 0.3061169918201809
+          }
+        },
+        "weighted_ensemble": {
+          "strategy": "weighted_ensemble",
+          "fusion_method": "xgboost_only (Bayes AUC=NaN)",
+          "bayes_auc": null,
+          "xgb_auc": 0.5,
+          "metrics": {
+            "auc": 0.5,
+            "aupr": 0.25,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "kappa": 0.0,
+            "brier": 0.24459075725323842
+          },
+          "alpha_grid_search": {
+            "alpha_values": [
+              0.0,
+              0.2,
+              0.4,
+              0.5,
+              0.6,
+              0.8,
+              1.0
+            ],
+            "results": [],
+            "best_alpha": null,
+            "best_metrics": null
+          },
+          "risk_quantile": 0.8
+        }
+      }
+    }
+  ]
+}

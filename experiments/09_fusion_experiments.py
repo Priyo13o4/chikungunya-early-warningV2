@@ -116,6 +116,62 @@ def compute_metrics(y_true: np.ndarray, y_prob: np.ndarray, threshold: float) ->
     return out
 
 
+def weighted_ensemble_safe(
+    bayes_prob: np.ndarray,
+    xgb_prob: np.ndarray,
+    bayes_auc: float,
+    xgb_auc: float,
+    fallback: str = 'xgboost'
+) -> tuple:
+    """
+    NaN-safe weighted ensemble combining Bayesian and XGBoost predictions.
+    
+    Args:
+        bayes_prob: Bayesian outbreak probabilities
+        xgb_prob: XGBoost outbreak probabilities
+        bayes_auc: Bayesian model AUC (can be NaN)
+        xgb_auc: XGBoost model AUC (can be NaN)
+        fallback: Which model to use when both AUCs are NaN ('bayesian' or 'xgboost')
+    
+    Returns:
+        tuple: (combined predictions, fusion method description)
+    
+    Fallback Strategy:
+        - Both AUCs valid → AUC-weighted average
+        - One AUC is NaN → Use the valid model only
+        - Both AUCs NaN → Use fallback model (default: xgboost)
+    """
+    # Check for NaN cases
+    bayes_valid = not np.isnan(bayes_auc) and bayes_auc > 0
+    xgb_valid = not np.isnan(xgb_auc) and xgb_auc > 0
+    
+    if bayes_valid and xgb_valid:
+        # Both models valid: AUC-weighted average
+        total_auc = bayes_auc + xgb_auc
+        weight_bayes = bayes_auc / total_auc
+        weight_xgb = xgb_auc / total_auc
+        
+        combined = weight_bayes * bayes_prob + weight_xgb * xgb_prob
+        method = f"weighted (Bayes {weight_bayes:.2f}, XGB {weight_xgb:.2f})"
+        
+    elif bayes_valid and not xgb_valid:
+        # Only Bayesian valid: use Bayesian
+        combined = bayes_prob
+        method = "bayesian_only (XGB AUC=NaN)"
+        
+    elif xgb_valid and not bayes_valid:
+        # Only XGBoost valid: use XGBoost
+        combined = xgb_prob
+        method = "xgboost_only (Bayes AUC=NaN)"
+        
+    else:
+        # Both invalid: use fallback
+        combined = xgb_prob if fallback == 'xgboost' else bayes_prob
+        method = f"{fallback}_fallback (both AUC=NaN)"
+    
+    return combined, method
+
+
 def fusion_strategy_b_gated_decision(
     fold_df: pd.DataFrame,
     prob_threshold: float,
@@ -152,9 +208,12 @@ def fusion_strategy_c_weighted_ensemble(
     alpha_values: List[float] | None = None,
 ) -> Dict[str, Any]:
     """
-    Strategy C: Weighted Ensemble
+    Strategy C: Weighted Ensemble (NaN-safe version)
     weighted_prob = α * P_bayes + (1-α) * P_xgboost
-    Try different α values.
+    
+    Handles single-class folds where AUC cannot be computed.
+    Uses AUC-based weighting when both models are valid, falls back
+    to best individual model otherwise.
     """
     valid_mask = pd.to_numeric(fold_df['y_true'], errors='coerce').notna()
     df = fold_df.loc[valid_mask].copy()
@@ -165,28 +224,126 @@ def fusion_strategy_c_weighted_ensemble(
     y_pred_proba_xgb = df['prob'].astype(float).values
     y_pred_proba_bayes = compute_bayes_prob_high_risk(df, risk_quantile=risk_quantile)
 
+    # Calculate individual model AUCs (may be NaN for single-class folds)
+    try:
+        if len(np.unique(y_true)) > 1:
+            bayes_auc = roc_auc_score(y_true, y_pred_proba_bayes)
+        else:
+            bayes_auc = np.nan
+    except (ValueError, RuntimeError):
+        bayes_auc = np.nan
+    
+    try:
+        if len(np.unique(y_true)) > 1:
+            xgb_auc = roc_auc_score(y_true, y_pred_proba_xgb)
+        else:
+            xgb_auc = np.nan
+    except (ValueError, RuntimeError):
+        xgb_auc = np.nan
+    
+    # Use NaN-safe weighted ensemble
+    y_pred_proba_weighted, fusion_method = weighted_ensemble_safe(
+        bayes_prob=y_pred_proba_bayes,
+        xgb_prob=y_pred_proba_xgb,
+        bayes_auc=bayes_auc,
+        xgb_auc=xgb_auc,
+        fallback='xgboost'
+    )
+    
+    # Compute metrics for weighted ensemble
+    try:
+        metrics = compute_metrics(y_true, y_pred_proba_weighted, threshold=prob_threshold)
+    except Exception as e:
+        print(f"    ⚠️  Metrics computation failed: {e}")
+        metrics = {'error': str(e)}
+    
+    # Also try grid search over alpha values (for comparison)
     alpha_values = alpha_values or [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0]
-    results = []
+    alpha_results = []
     
     for alpha in alpha_values:
-        y_pred_proba_weighted = alpha * y_pred_proba_bayes + (1 - alpha) * y_pred_proba_xgb
-        metrics = compute_metrics(y_true, y_pred_proba_weighted, threshold=prob_threshold)
-        
-        results.append({
-            'alpha': alpha,
-            'metrics': metrics
-        })
+        try:
+            y_pred_alpha = alpha * y_pred_proba_bayes + (1 - alpha) * y_pred_proba_xgb
+            # Skip if produces NaN
+            if not np.any(np.isnan(y_pred_alpha)):
+                alpha_metrics = compute_metrics(y_true, y_pred_alpha, threshold=prob_threshold)
+                alpha_results.append({
+                    'alpha': alpha,
+                    'metrics': alpha_metrics
+                })
+        except Exception:
+            pass  # Skip invalid alpha values
     
-    best_result = max(results, key=lambda x: x['metrics']['aupr']) if results else None
+    best_alpha_result = max(alpha_results, key=lambda x: x['metrics'].get('aupr', 0.0)) if alpha_results else None
     
     return {
         'strategy': 'weighted_ensemble',
-        'alpha_grid': alpha_values,
-        'results': results,
-        'best_alpha': best_result['alpha'] if best_result else None,
-        'best_metrics': best_result['metrics'] if best_result else None,
+        'fusion_method': fusion_method,
+        'bayes_auc': float(bayes_auc) if not np.isnan(bayes_auc) else None,
+        'xgb_auc': float(xgb_auc) if not np.isnan(xgb_auc) else None,
+        'metrics': metrics,
+        'alpha_grid_search': {
+            'alpha_values': alpha_values,
+            'results': alpha_results,
+            'best_alpha': best_alpha_result['alpha'] if best_alpha_result else None,
+            'best_metrics': best_alpha_result['metrics'] if best_alpha_result else None,
+        },
         'risk_quantile': risk_quantile,
     }
+
+
+# =============================================================================
+# FUSION DIAGNOSTICS
+# =============================================================================
+
+def print_fusion_summary(all_results: List[Dict[str, Any]]) -> None:
+    """
+    Print summary of fusion strategies used per fold.
+    """
+    print(f"\n{'='*60}")
+    print("FUSION STRATEGY SUMMARY")
+    print(f"{'='*60}")
+    
+    print("\nWeighted Ensemble Methods Used:")
+    for fold_result in all_results:
+        fold_name = fold_result['fold']
+        if 'weighted_ensemble' not in fold_result['strategies']:
+            print(f"  {fold_name}: ❌ Not executed")
+            continue
+        
+        strat = fold_result['strategies']['weighted_ensemble']
+        if 'error' in strat:
+            print(f"  {fold_name}: ❌ Failed - {strat['error']}")
+        elif 'fusion_method' in strat:
+            method = strat['fusion_method']
+            auc = strat.get('metrics', {}).get('auc', 'N/A')
+            if isinstance(auc, float):
+                print(f"  {fold_name}: {method} (AUC={auc:.3f})")
+            else:
+                print(f"  {fold_name}: {method}")
+        else:
+            print(f"  {fold_name}: ✓ Success")
+    
+    # Count fusion method types
+    method_counts = {}
+    valid_folds = 0
+    for fold_result in all_results:
+        if 'weighted_ensemble' not in fold_result['strategies']:
+            continue
+        strat = fold_result['strategies']['weighted_ensemble']
+        if 'error' in strat or 'fusion_method' not in strat:
+            continue
+        
+        valid_folds += 1
+        method = strat['fusion_method']
+        # Extract method type (e.g., "weighted", "xgboost_only", "fallback")
+        method_type = method.split('(')[0].strip()
+        method_counts[method_type] = method_counts.get(method_type, 0) + 1
+    
+    if method_counts:
+        print(f"\nFusion Method Distribution ({valid_folds} valid folds):")
+        for method, count in sorted(method_counts.items(), key=lambda x: -x[1]):
+            print(f"  {method}: {count} folds")
 
 
 # =============================================================================
@@ -216,15 +373,26 @@ def run_fusion_experiments_for_fold(
             fold_df,
             prob_threshold=prob_threshold,
         )
+        print(f"    ✓ Gated decision completed")
     except Exception as e:
         print(f"    ✗ Gated decision failed: {e}")
         results['strategies']['gated_decision'] = {'error': str(e)}
     
     try:
-        results['strategies']['weighted_ensemble'] = fusion_strategy_c_weighted_ensemble(
+        result = fusion_strategy_c_weighted_ensemble(
             fold_df,
             prob_threshold=prob_threshold,
         )
+        results['strategies']['weighted_ensemble'] = result
+        
+        # Print fusion method used
+        fusion_method = result.get('fusion_method', 'unknown')
+        print(f"    ✓ Weighted ensemble: {fusion_method}")
+        
+        # Print AUC if available
+        if 'metrics' in result and 'auc' in result['metrics']:
+            auc = result['metrics']['auc']
+            print(f"      AUC: {auc:.3f}")
     except Exception as e:
         print(f"    ✗ Weighted ensemble failed: {e}")
         results['strategies']['weighted_ensemble'] = {'error': str(e)}
@@ -260,6 +428,9 @@ def main():
         )
         all_results.append(fold_result)
     
+    # Print fusion summary
+    print_fusion_summary(all_results)
+    
     # Aggregate results
     print(f"\n{'='*60}")
     print("AGGREGATED FUSION RESULTS")
@@ -276,25 +447,32 @@ def main():
             if strategy not in fold_result['strategies']:
                 continue
             strat = fold_result['strategies'][strategy]
-            metrics = strat.get('metrics')
+            
+            # Get metrics based on strategy
             if strategy == 'weighted_ensemble':
-                metrics = strat.get('best_metrics')
-            if metrics:
+                metrics = strat.get('metrics')
+            else:
+                metrics = strat.get('metrics')
+            
+            if metrics and 'error' not in metrics:
                 strategy_metrics.append(metrics)
         
         if len(strategy_metrics) > 0:
             # Average metrics
             avg_metrics = {}
             for key in strategy_metrics[0].keys():
-                values = [m[key] for m in strategy_metrics if m[key] is not None]
+                values = [m[key] for m in strategy_metrics if key in m and m[key] is not None]
                 if len(values) > 0:
                     avg_metrics[f'{key}_mean'] = float(np.mean(values))
                     avg_metrics[f'{key}_std'] = float(np.std(values))
             
+            avg_metrics['n_valid_folds'] = len(strategy_metrics)
             aggregated[strategy] = avg_metrics
     
     for strategy, metrics in aggregated.items():
         print(f"\n{strategy.upper()}:")
+        n_folds = metrics.get('n_valid_folds', 0)
+        print(f"  Valid folds: {n_folds}")
         if 'auc_mean' in metrics:
             print(f"  AUC: {metrics['auc_mean']:.3f} ± {metrics['auc_std']:.3f}")
         if 'aupr_mean' in metrics:
@@ -330,5 +508,82 @@ def main():
     print(f"\n✓ Results saved to: {output_path}")
 
 
+def test_nan_safe_fusion():
+    """
+    Validation test for NaN-safe weighted ensemble.
+    Tests all 4 scenarios: both valid, one NaN, both NaN.
+    """
+    print(f"\n{'='*60}")
+    print("VALIDATION: NaN-Safe Fusion Test Cases")
+    print(f"{'='*60}\n")
+    
+    # Test data
+    bayes_prob = np.array([0.3, 0.7, 0.5, 0.6])
+    xgb_prob = np.array([0.4, 0.8, 0.6, 0.7])
+    
+    test_cases = [
+        {
+            'name': 'Both valid',
+            'bayes_auc': 0.6,
+            'xgb_auc': 0.75,
+            'expected_method': 'weighted'
+        },
+        {
+            'name': 'Bayes NaN',
+            'bayes_auc': np.nan,
+            'xgb_auc': 0.75,
+            'expected_method': 'xgboost_only'
+        },
+        {
+            'name': 'XGB NaN',
+            'bayes_auc': 0.6,
+            'xgb_auc': np.nan,
+            'expected_method': 'bayesian_only'
+        },
+        {
+            'name': 'Both NaN',
+            'bayes_auc': np.nan,
+            'xgb_auc': np.nan,
+            'expected_method': 'fallback'
+        }
+    ]
+    
+    all_passed = True
+    for i, case in enumerate(test_cases, 1):
+        combined, method = weighted_ensemble_safe(
+            bayes_prob, xgb_prob,
+            case['bayes_auc'], case['xgb_auc']
+        )
+        
+        # Check no NaN in output
+        has_nan = np.any(np.isnan(combined))
+        expected_in_method = case['expected_method'] in method
+        
+        status = "\u2713" if (not has_nan and expected_in_method) else "\u2717"
+        if has_nan or not expected_in_method:
+            all_passed = False
+        
+        print(f"Test {i}: {case['name']}")
+        print(f"  Bayes AUC: {case['bayes_auc']}")
+        print(f"  XGB AUC: {case['xgb_auc']}")
+        print(f"  Result: {method}")
+        print(f"  NaN-free: {not has_nan} {status}")
+        print(f"  Expected method type: {case['expected_method']} {'[\u2713]' if expected_in_method else '[\u2717]'}")
+        print()
+    
+    print(f"{'='*60}")
+    if all_passed:
+        print("\u2713 All validation tests PASSED")
+    else:
+        print("\u2717 Some validation tests FAILED")
+    print(f"{'='*60}\n")
+    
+    return all_passed
+
+
 if __name__ == '__main__':
-    main()
+    # Check if running in test mode
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        test_nan_safe_fusion()
+    else:
+        main()

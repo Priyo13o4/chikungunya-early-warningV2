@@ -156,6 +156,38 @@ class BayesianStateSpace(BaseModel):
         # NaN would cause Stan to fail with "log location parameter is nan"
         temp_anomaly = np.nan_to_num(temp_anomaly, nan=0.0)
         
+        # Extract degree-days (mechanistic temperature threshold)
+        if 'feat_degree_days_above_20' in df.columns:
+            degree_days = df['feat_degree_days_above_20'].values
+        elif 'degree_days_above_20' in df.columns:
+            degree_days = df['degree_days_above_20'].values
+        else:
+            # Fallback: compute from temperature if available
+            if 'temp_celsius' in df.columns:
+                temp = df['temp_celsius'].values
+                degree_days = np.maximum(temp - 20.0, 0.0) * 7  # Weekly degree-days
+            else:
+                degree_days = np.zeros(N)
+        
+        # CRITICAL: Replace any NaN values with 0 (neutral signal)
+        degree_days = np.nan_to_num(degree_days, nan=0.0)
+        
+        # FIX #6: CRITICAL - Scale degree_days to prevent Stan overflow
+        # Unscaled values up to 372.57 cause exp(log_mu) > 10^86 overflow
+        # Scaling by 100 reduces range to [0, 3.73], preventing numerical issues
+        degree_days = degree_days / 100.0
+        
+        # Extract rainfall persistence (4-week cumulative)
+        if 'feat_rain_persist_4w' in df.columns:
+            rain_persist = df['feat_rain_persist_4w'].values
+        elif 'rain_persist_4w' in df.columns:
+            rain_persist = df['rain_persist_4w'].values
+        else:
+            rain_persist = np.zeros(N)
+        
+        # CRITICAL: Replace any NaN values with 0 (neutral signal)
+        rain_persist = np.nan_to_num(rain_persist, nan=0.0)
+        
         stan_data = {
             'N': N,
             'D': D,
@@ -163,8 +195,40 @@ class BayesianStateSpace(BaseModel):
             'district': df['district_id'].values,
             'time': df['time_idx'].values,
             'y': y,
-            'temp_anomaly': temp_anomaly
+            'temp_anomaly': temp_anomaly,
+            'degree_days': degree_days,
+            'rain_persist': rain_persist
         }
+        
+        # FIX #6: Input validation to catch issues before Stan
+        # Validate all arrays are finite (no NaN, no Inf)
+        assert np.isfinite(temp_anomaly).all(), "temp_anomaly contains non-finite values (NaN/Inf)"
+        assert np.isfinite(degree_days).all(), "degree_days contains non-finite values (NaN/Inf)"
+        assert np.isfinite(rain_persist).all(), "rain_persist contains non-finite values (NaN/Inf)"
+        assert np.isfinite(y).all(), "case counts contain non-finite values (NaN/Inf)"
+        
+        # Validate ranges to prevent overflow
+        if np.abs(degree_days).max() > 10:
+            raise ValueError(
+                f"degree_days too large after scaling (max={np.abs(degree_days).max():.2f}). "
+                f"Expected < 10 after /100 scaling. Check feature engineering."
+            )
+        
+        if np.abs(temp_anomaly).max() > 20:
+            raise ValueError(
+                f"temp_anomaly too large (max={np.abs(temp_anomaly).max():.2f}). "
+                f"Expected |anomaly| < 20°C. Check data quality."
+            )
+        
+        # Warn about data sparsity (increases Stan failure risk)
+        coverage = N / (D * T_max)
+        if coverage < 0.05:
+            warnings.warn(
+                f"Data is very sparse: {coverage*100:.1f}% coverage ({N} obs / {D}×{T_max} grid). "
+                f"Latent states may be poorly constrained. Consider filtering to districts with "
+                f"better temporal coverage or expect longer MCMC convergence times.",
+                UserWarning
+            )
         
         # Add forecast data if provided
         if forecast_df is not None:
@@ -229,11 +293,34 @@ class BayesianStateSpace(BaseModel):
             # CRITICAL: Replace any NaN values with 0 (neutral anomaly) for forecasts too
             temp_anomaly_forecast = np.nan_to_num(temp_anomaly_forecast, nan=0.0)
             
+            # Forecast degree-days
+            if 'feat_degree_days_above_20' in forecast_df.columns:
+                degree_days_forecast = forecast_df['feat_degree_days_above_20'].values
+            elif 'temp_celsius' in forecast_df.columns:
+                temp = forecast_df['temp_celsius'].values
+                degree_days_forecast = np.maximum(temp - 20.0, 0.0) * 7
+            else:
+                degree_days_forecast = np.zeros(len(forecast_df))
+            
+            # CRITICAL: Replace any NaN values with 0 (neutral signal)
+            degree_days_forecast = np.nan_to_num(degree_days_forecast, nan=0.0)
+            
+            # Forecast rain persistence
+            if 'feat_rain_persist_4w' in forecast_df.columns:
+                rain_persist_forecast = forecast_df['feat_rain_persist_4w'].values
+            else:
+                rain_persist_forecast = np.zeros(len(forecast_df))
+            
+            # CRITICAL: Replace any NaN values with 0 (neutral signal)
+            rain_persist_forecast = np.nan_to_num(rain_persist_forecast, nan=0.0)
+            
             stan_data.update({
                 'N_forecast': len(forecast_df),
                 'district_forecast': forecast_df['district_id'].astype(int).values,
                 'time_forecast': forecast_df['time_idx'].astype(int).values,
-                'temp_anomaly_forecast': temp_anomaly_forecast
+                'temp_anomaly_forecast': temp_anomaly_forecast,
+                'degree_days_forecast': degree_days_forecast,
+                'rain_persist_forecast': rain_persist_forecast
             })
             
             # Store forecast mapping for later retrieval
@@ -275,10 +362,18 @@ class BayesianStateSpace(BaseModel):
         if df is None:
             raise ValueError("DataFrame with metadata required for Bayesian model")
         
-        # Compile Stan model
+        # Compile Stan model with C++ optimizations
         stan_file = self._get_stan_file()
         print(f"Compiling Stan model from {stan_file}...")
-        self.model_ = CmdStanModel(stan_file=str(stan_file))
+        cpp_options = {
+            'STAN_OPENCL': 'FALSE',  # Metal not supported, disable OpenCL
+            'CXXFLAGS': '-O3 -march=native -mtune=native'  # Aggressive CPU optimizations
+        }
+        print(f"Using C++ optimizations: {cpp_options['CXXFLAGS']}")
+        self.model_ = CmdStanModel(
+            stan_file=str(stan_file),
+            cpp_options=cpp_options
+        )
         
         # Prepare data (including forecast if provided)
         print("Preparing data for Stan...")

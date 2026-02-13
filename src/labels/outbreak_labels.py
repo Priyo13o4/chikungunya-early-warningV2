@@ -82,7 +82,6 @@ def create_outbreak_labels(
     def check_future_outbreak(group):
         """Check if outbreak occurs in next H weeks."""
         labels = []
-        values = group[value_col].values
         thresholds = group['_threshold'].values
         
         for i in range(len(group)):
@@ -90,16 +89,17 @@ def create_outbreak_labels(
                 labels.append(np.nan)
                 continue
                 
-            # FIX #4: Look at NEXT H weeks (t+1 to t+H), excluding current week t
-            # This prevents label leakage - we predict future outbreaks, not current state
-            future_start = i + 1
-            future_end = min(i + 1 + horizon, len(group))
+            # FIX: Use week-based temporal logic instead of index-based slicing
+            # This prevents "time travel" effect with sparse data
+            current_week = group.iloc[i]['week']
+            future_mask = (group['week'] > current_week) & (group['week'] <= current_week + horizon)
+            future_values = group[future_mask][value_col].values
             
-            if future_end <= future_start:
+            # Handle edge case: no future data available
+            if len(future_values) == 0:
                 labels.append(np.nan)
                 continue
             
-            future_values = values[future_start:future_end]
             threshold = thresholds[i]
             
             # Label = 1 if any future week exceeds threshold

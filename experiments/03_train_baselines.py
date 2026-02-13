@@ -29,7 +29,7 @@ import numpy as np
 
 from src.config import load_config, get_project_root, get_repo_root
 from src.features.feature_sets import select_feature_columns
-from src.evaluation.cv import create_rolling_origin_splits, prepare_train_test
+from src.evaluation.cv import create_stratified_temporal_folds, prepare_train_test
 from src.evaluation.metrics import compute_all_metrics, print_metrics
 from src.labels.outbreak_labels import create_outbreak_labels
 
@@ -161,9 +161,9 @@ def main():
     parser.add_argument(
         "--feature-set",
         type=str,
-        default="full",
-        choices=["full", "core"],
-        help="Which feature set to use: full (all feat_*) or core (sparse-robust subset)"
+        default="track_a",
+        choices=["full", "core", "track_a"],
+        help="Which feature set to use: full (all 37), core (20 sparse-robust), track_a (9 mechanistic)"
     )
     parser.add_argument(
         "--outbreak-percentiles",
@@ -230,12 +230,20 @@ def main():
         valid_df = df_run.dropna(subset=[target_col]).copy()
         print(f"  → {len(valid_df)} labeled samples")
 
-        # Create CV splits
+        # Create stratified CV splits
         test_years = cfg['cv']['test_years']
-        folds = create_rolling_origin_splits(valid_df, test_years=test_years)
-        print(f"\nCV Folds: {len(folds)}")
+        folds = create_stratified_temporal_folds(
+            df=valid_df,
+            target_col=target_col,
+            year_col='year',
+            min_positives=5,
+            candidate_test_years=test_years,
+            verbose=False
+        )
+        print(f"\nCV Folds: {len(folds)} (stratified to ensure ≥5 positives/fold)")
         for fold in folds:
-            print(f"  {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}")
+            test_years_str = "-".join(map(str, fold.test_years))
+            print(f"  {fold.fold_name}: train={len(fold.train_idx)}, test={len(fold.test_idx)}, test_years={test_years_str}")
 
         print(f"\nModels: {list(models.keys())}")
 
